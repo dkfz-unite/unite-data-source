@@ -1,0 +1,50 @@
+﻿{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:60575",
+      "sslPort": 44387
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchUrl": "api",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "UNITE_AUTH_KEY": "Defautl32BitApiKeyHasToBeChanged",
+        "UNITE_WORKER_HOST": "http://localhost:5300",
+        "UNITE_WORKER_TOKEN": "DefaultJWTApiTokenHasToBeChanged",
+        "UNITE_PORTAL_HOST": "http://localhost",
+        "UNITE_DONORS_FEED_HOST": "http://localhost/api/donors-feed",
+        "UNITE_IMAGES_FEED_HOST": "http://localhost/api/images-feed",
+        "UNITE_SPECIMENS_FEED_HOST": "http://localhost/api/specimens-feed",
+        "UNITE_GENOME_FEED_HOST": "http://localhost/api/genome-feed",
+        "UNITE_CONFING_PATH": "./confing",
+        "UNITE_CACHE_PATH": "./cache",
+        "UNITE_DATA_PATH": "/data"
+      }
+    },
+    "Unite.Genome.Feed.Web": {
+      "commandName": "Project",
+      "launchUrl": "api",
+      "applicationUrl": "http://localhost:5300",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "UNITE_AUTH_KEY": "Defautl32BitApiKeyHasToBeChanged",
+        "UNITE_WORKER_HOST": "http://localhost:5300",
+        "UNITE_WORKER_TOKEN": "DefaultJWTApiTokenHasToBeChanged",
+        "UNITE_PORTAL_HOST": "http://localhost",
+        "UNITE_DONORS_FEED_HOST": "http://localhost/api/donors-feed",
+        "UNITE_IMAGES_FEED_HOST": "http://localhost/api/images-feed",
+        "UNITE_SPECIMENS_FEED_HOST": "http://localhost/api/specimens-feed",
+        "UNITE_GENOME_FEED_HOST": "http://localhost/api/genome-feed",
+        "UNITE_CONFING_PATH": "./confing",
+        "UNITE_CACHE_PATH": "./cache",
+        "UNITE_DATA_PATH": "/data"
+      }
+    }
+  }
+}
