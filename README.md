@@ -4,7 +4,7 @@
 Data source service provides the following functionality:
 - Uses custom crawlers to find required files.
 - Uses custom readers to read the files.
-- Hosts required files, and provides protected API to access the by a url.
+- Hosts required files, and provides protected API to access them by a url.
 
 ## Access
 Environment|Address|Port
