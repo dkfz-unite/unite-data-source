@@ -84,12 +84,12 @@ my/folder   my-crawler  dna, dna-ssm, dna-cnv, dna-sv
 
 4) Build and publish the application to desired location where it's gonna be running on the server, e.g. `/srv/app`:
     ```bash
-    dotnet publish Unite.Data.Source.Web -c Release -o /srv/unite-data-source -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:DebugType=None --self-contained   
+    dotnet publish Unite.Data.Source.Web -c Release -o /srv/app -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:DebugType=None --self-contained   
     ```
 
 5) Navigate to just published application folder:
     ```bash
-    cd /srv/unite-data-source
+    cd /srv/app
     ```
 
 6) Run and host the application publicly on the server:
