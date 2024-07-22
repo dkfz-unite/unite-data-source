@@ -4,7 +4,7 @@
 Data source service provides the following functionality:
 - Uses custom crawlers to find required files.
 - Uses custom readers to read the files.
-- Hosts required files, and provides protected API to access the by a url.
+- Hosts required files, and provides protected API to access them by a url.
 
 ## Access
 Environment|Address|Port
@@ -12,6 +12,8 @@ Environment|Address|Port
 Host|http://localhost:5300|5300
 
 ## Configuration
+
+### Application
 To configure the application, change environment variables in either docker or [launchSettings.json](Unite.Data.Source.Web/Properties/launchSettings.json) file (if running locally):
 
 - `ASPNETCORE_ENVIRONMENT` - ASP.NET environment (`Release`).
@@ -32,6 +34,37 @@ To configure the application, change environment variables in either docker or [
 - `UNITE_CACHE_PATH` - Path to the cache folder (`./cache`).
 - `UNITE_DATA_PATH` - Path to the data folder (`/data`).  
     Allows to set custom root files path.
+
+### Crawlers
+Data crawlers(explorers) are **custom** applications used to find required files in desired folders.  
+Please, read [crawlers](./Docs/crawler.md) documentation to understand how to create and configure them.
+
+To configure the crawlers, create a configuration file `config.tsv` in the configuration folder ('UNITE_CONFIG_PATH') with the following structure:
+```tsv
+folder  crawler types
+my/folder   my-crawler  dna, dna-ssm, dna-cnv, dna-sv
+```
+
+- `folder` - Relative (if `UNITE_DATA_PATH` is set) or absolute path to the folder where the crawler should look for files.
+- `crawler` - Name of the crawler to use. Application will expect the following:
+    - There is a subfolder in the configuration folder (`UNITE_CONFIG_PATH`) with the **same** name as configured crawler.
+    - There is an file in configured crawler folder with the name **'crawler'**.
+- `types` - Comma separated list of [data types](./Docs/types.md) to look for in configured folder.
+
+**For example:**
+```txt
+- /srv/config
+    config.tsv
+    - my-crawler
+        crawler
+```
+
+> [!Note]
+> If there is no crawlers configured, the application will do nothing.
+
+> [!Warning]
+> It's highly recommended to configure `UNITE_DATA_PATH` to desired root folder, so that the application can work with relative locations of the files and can run properly on different environments (e.g. local or docker) without changing the configuration. Otherwise, if you host the application on a different server, all links to hosted files will be **broken**.
+
 
 ## Installation
 
@@ -78,32 +111,32 @@ To configure the application, change environment variables in either docker or [
         ```
     - Put created configuration, required crawler and it's data readers to configuration folder to have the following structure:
         ```txt
-        - /srv/unite-data-source
+        - /srv/app
             Unite.Data.Source.Web
             - config
                 config.tsv
                 - org
-                    crawler.app
+                    crawler
                     - readers
-                        ssm.app
-                        cnv.app
-                        sv.app
-                        exp.app
+                        ssm
+                        cnv
+                        sv
+                        exp
         ```
 
 8) Application will do the folling:
     - Use the crawler `org` and run it for every listed (`dna`, `dna-ssm`, `dna-cnv`, `dna-sv`, `rna`, `rna-exp`) data type to find corresponding files in configured project folders relative to configured `/data/` folder: `/data/org/proj_a`, `/data/org/proj_b`, `/data/org/proj_c`.
-    - If the found file is a resource (e.g. **BAM** file):
-        - File metadata will be sent to UNITE Portal with newly generated file key (e.g. `org-1234567890`).
-        - File will be hosted by the application and will be accessible by the public application url: `http://source.data.unite.net/api/files/org-1234567890`.
+    - If the found file is of a resource data [type](./Docs/types.md#resources) (e.g. DAM file):
+        - File metadata will be sent to UNITE Portal with newly generated file key (e.g. `1234567890`).
+        - File will be hosted by the application and will be accessible by the public application url: `http://source.data.unite.net/api/files/1234567890`.
     - If the found file contains data (e.g. DNA ssm data):
-        - Corresponding to the data type `dna-ssm` reader will be used to read the content of the file.
+        - Corresponding reader will be used to read the content of the file.
         - File data and it's metadata will be sent to UNITE Portal for further processing and integration.
 
 > [!Warning]
-> If you stop the application, the hosted files will be no longer accessible by the public url.
+> If you stop the application, the hosted files will be no longer accessible by their urls.
 
 > [!Note]
 > It's recommended to host the application separatelly from UNITE Portal and closer to the data, to keep access to the files fast and reliable.
 
-![alt text](./Docs/architecture.jpg)
+![Example architecture](./Docs/architecture.jpg)

@@ -16,7 +16,7 @@ public class ConfigEntry
     /// <summary>
     /// Types of the data to be found by the crawler (e.g. dna, dna/ssm, dna/cnv, dna/sv, rna, rna/exp, rnasc, rnasc/exp, etc.).
     /// </summary>
-    [Column("type")]
+    [Column("types")]
     public string[] Types { get; set; }
 
     /// <summary>
