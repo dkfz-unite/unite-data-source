@@ -3,7 +3,7 @@ namespace Unite.Data.Source.Web.Handlers;
 public class HostFilesCache
 {
     private readonly string _path;
-    private readonly Dictionary<string, string> _entries = new();
+    private readonly Dictionary<string, string> _entries = [];
 
 
     public HostFilesCache(string path)

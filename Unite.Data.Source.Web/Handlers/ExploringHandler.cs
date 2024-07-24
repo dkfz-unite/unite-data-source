@@ -3,7 +3,6 @@ using System.Text;
 using Unite.Data.Source.Web.Configuration.Options;
 using Unite.Data.Source.Web.Handlers.Constants;
 using Unite.Data.Source.Web.Handlers.Contract;
-using Unite.Data.Source.Web.Handlers.Files;
 using Unite.Essentials.Tsv;
 
 namespace Unite.Data.Source.Web.Handlers;
@@ -13,6 +12,7 @@ public class ExploringHandler
     private readonly WorkerOptions _workerOptions;
     private readonly ConfigOptions _configOptions;
     private readonly FeedOptions _feedOptions;
+    private readonly ILogger _logger;
     
     private readonly string _configPath;
     private readonly FoundFilesCache _foundFilesCache;
@@ -22,11 +22,13 @@ public class ExploringHandler
     public ExploringHandler(
         WorkerOptions workerOptions,
         ConfigOptions confOptions,
-        FeedOptions feedOptions)
+        FeedOptions feedOptions,
+        ILogger<ExploringHandler> logger)
     {
         _workerOptions = workerOptions;
         _configOptions = confOptions;
         _feedOptions = feedOptions;
+        _logger = logger;
 
         _configPath = Path.Combine(_configOptions.ConfigPath, "config.tsv");
         _foundFilesCache = new FoundFilesCache(Path.Combine(_configOptions.CachePath, "found-files.tsv"));
@@ -51,53 +53,53 @@ public class ExploringHandler
                 var crawlerProcess = PrepareProcess(crawlerPath, type, Path.Combine(_configOptions.DataPath, folderConfig.Path));
                 var crawlerOutput = await RunProcess(crawlerProcess);
 
-                var filesMetadata = ReadFilesMetadata(type, crawlerOutput);
+                var filesMetadata = TsvReader.Read<FileMetadata>(crawlerOutput).ToArray();
 
                 foreach (var fileMetadata in filesMetadata)
                 {
                     var filePath = GetPath(_configOptions.DataPath, fileMetadata.Path);
+                    var isResource = IsResourceType(type);
+                    var content = string.Empty;
+                    var key = (string)null;
 
                     if (_foundFilesCache.Contains(filePath))
                     {
                         continue;
                     }
 
-                    string key = null;
-                    string content = fileMetadata.ToString();
-
-                    if (fileMetadata.Reader != null)
+                    if (fileMetadata.Reader.StartsWith("cmd/"))
                     {
-                        if (fileMetadata.Reader.StartsWith("cmd/"))
-                        {
-                            var readerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "readers", fileMetadata.Reader[4..]);
-                            var readerProcess = PrepareProcess(readerPath, fileMetadata.Path);
-                            var readerOutput = await RunProcess(readerProcess);
-                            content += Environment.NewLine + readerOutput;
-                        }
-                        else
-                        {
-                            var readerOutput = await File.ReadAllTextAsync(fileMetadata.Path);
-                            content += Environment.NewLine + readerOutput;
-                        }
+                        var readerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "readers", fileMetadata.Reader[4..]);
+                        var readerProcess = PrepareProcess(readerPath, fileMetadata.Path);
+                        content += await RunProcess(readerProcess);
                     }
                     else
                     {
-                        key = Guid.NewGuid().ToString();
-                        var resource = new Resource(type, fileMetadata.Format, $"{_workerOptions.Host}/api/files/{key}");
-                        var tsv = TsvWriter.Write([resource]);
-                        content += Environment.NewLine + tsv;
+                        content += await File.ReadAllTextAsync(fileMetadata.Path);
                     }
 
-                    var uploaded = UploadFileContent(type, content);
-
-                    if (uploaded)
+                    if (isResource)
                     {
-                        if (key != null)
+                        key = Guid.NewGuid().ToString();
+                        var resource = new Resource(type, fileMetadata.Format, filePath);
+                        content += Environment.NewLine + TsvWriter.Write([resource]);
+                    }
+
+                    try
+                    {
+                        UploadFileContent(type, content);
+
+                        if (isResource)
                         {
                             _hostFilesCache.Add(key, filePath);
                         }
 
                         _foundFilesCache.Add(filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to upload file '{path}'", filePath);
+                    
                     }
                 }
             }
@@ -106,20 +108,7 @@ public class ExploringHandler
         await Task.CompletedTask;
     }
 
-
-    private BaseFile[] ReadFilesMetadata(string type, string metadata)
-    {
-        if (type == DataTypes.Genome.Dna.Sample || type == DataTypes.Genome.Rna.Sample || type == DataTypes.Genome.Rnasc.Sample)
-            return TsvReader.Read<SampleFile>(metadata).ToArray();
-        else if (type == DataTypes.Genome.Dna.Ssm || type == DataTypes.Genome.Dna.Cnv || type == DataTypes.Genome.Dna.Sv)
-            return TsvReader.Read<DnaAnalysisFile>(metadata).ToArray();
-        else if (type == DataTypes.Genome.Rna.Exp)
-            return TsvReader.Read<RnaAnalysisFile>(metadata).ToArray();
-        else
-            return TsvReader.Read<BaseFile>(metadata).ToArray();
-    }
-
-    private bool UploadFileContent(string type, string content)
+    private void UploadFileContent(string type, string content)
     {
         using var client = new HttpClient();
 
@@ -153,9 +142,12 @@ public class ExploringHandler
         
         request.Content = new StringContent(content, Encoding.UTF8, "text/tab-separated-values");
 
-        var response = client.SendAsync(request).Result;
+        var result = client.SendAsync(request).Result;
 
-        return response.IsSuccessStatusCode;
+        if (!result.IsSuccessStatusCode)
+        {
+            throw new Exception($"Failed to upload file content to '{url}'");
+        }
     }
 
     private static Process PrepareProcess(string path, params string[] arguments)
@@ -193,5 +185,17 @@ public class ExploringHandler
             return filePath;
         
         return filePath[dataPath.Length..];
+    }
+
+    private static bool IsResourceType(string type)
+    {
+        return type switch
+        {
+            DataTypes.Genome.Dna.Sample => true,
+            DataTypes.Genome.Rna.Sample => true,
+            DataTypes.Genome.Rnasc.Sample => true,
+            DataTypes.Genome.Rnasc.Exp => true,
+            _ => false
+        };
     }
 }
