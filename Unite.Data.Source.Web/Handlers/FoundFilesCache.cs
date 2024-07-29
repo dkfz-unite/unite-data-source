@@ -8,8 +8,14 @@ public class FoundFilesCache
 
     public FoundFilesCache(string path)
     {
-        if (!File.Exists(path))
-            File.Create(path).Close();
+        var folderPath = Path.GetDirectoryName(path);
+        var filePath = path;
+
+        if (!Directory.Exists(folderPath))
+            Directory.CreateDirectory(folderPath);
+        
+        if (!File.Exists(filePath))
+            File.Create(filePath).Close();
 
         _path = path;
         _entries = File.ReadAllLines(path).ToHashSet();

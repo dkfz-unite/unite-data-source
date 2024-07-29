@@ -18,16 +18,16 @@
         "UNITE_WORKER_HOST": "http://localhost:5300",
         "UNITE_WORKER_TOKEN": "DefaultJWTApiTokenHasToBeChanged",
         "UNITE_PORTAL_HOST": "http://localhost",
-        "UNITE_DONORS_FEED_HOST": "http://localhost/api/donors-feed",
-        "UNITE_IMAGES_FEED_HOST": "http://localhost/api/images-feed",
-        "UNITE_SPECIMENS_FEED_HOST": "http://localhost/api/specimens-feed",
-        "UNITE_GENOME_FEED_HOST": "http://localhost/api/genome-feed",
-        "UNITE_CONFING_PATH": "./confing",
+        "UNITE_DONORS_FEED_HOST": "http://localhost:5100",
+        "UNITE_IMAGES_FEED_HOST": "http://localhost:5102",
+        "UNITE_SPECIMENS_FEED_HOST": "http://localhost:5104",
+        "UNITE_GENOME_FEED_HOST": "http://localhost:5106",
+        "UNITE_CONFIG_PATH": "./config",
         "UNITE_CACHE_PATH": "./cache",
         "UNITE_DATA_PATH": "/data"
       }
     },
-    "Unite.Genome.Feed.Web": {
+    "Unite.Data.Source.Web": {
       "commandName": "Project",
       "launchUrl": "api",
       "applicationUrl": "http://localhost:5300",
@@ -37,11 +37,11 @@
         "UNITE_WORKER_HOST": "http://localhost:5300",
         "UNITE_WORKER_TOKEN": "DefaultJWTApiTokenHasToBeChanged",
         "UNITE_PORTAL_HOST": "http://localhost",
-        "UNITE_DONORS_FEED_HOST": "http://localhost/api/donors-feed",
-        "UNITE_IMAGES_FEED_HOST": "http://localhost/api/images-feed",
-        "UNITE_SPECIMENS_FEED_HOST": "http://localhost/api/specimens-feed",
-        "UNITE_GENOME_FEED_HOST": "http://localhost/api/genome-feed",
-        "UNITE_CONFING_PATH": "./confing",
+        "UNITE_DONORS_FEED_HOST": "http://localhost:5100",
+        "UNITE_IMAGES_FEED_HOST": "http://localhost:5102",
+        "UNITE_SPECIMENS_FEED_HOST": "http://localhost:5104",
+        "UNITE_GENOME_FEED_HOST": "http://localhost:5106",
+        "UNITE_CONFIG_PATH": "./config",
         "UNITE_CACHE_PATH": "./cache",
         "UNITE_DATA_PATH": "/data"
       }

@@ -50,7 +50,7 @@ public class ExploringWorker : BackgroundService
             }
             finally
             {
-                await Task.Delay(_interval, stoppingToken);
+                await Task.Delay(1000, stoppingToken);
             }
         }
     }
