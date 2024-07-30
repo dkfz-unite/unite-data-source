@@ -16,18 +16,21 @@ public class ConfigEntry
     /// <summary>
     /// Types of the data to be found by the crawler (e.g. dna, dna/ssm, dna/cnv, dna/sv, rna, rna/exp, rnasc, rnasc/exp, etc.).
     /// </summary>
-    [Column("types")]
+    [Column("types", typeof(StringArrayConverter))]
     public string[] Types { get; set; }
 
     /// <summary>
     /// Absolute path to the folder to explore (e.g. "/data/project").
     /// </summary>
-    [Column("path", typeof(StringArrayConverter))]
+    [Column("path")]
     public string Path { get; set; }
 
    
     public static ConfigEntry[] Read(string path)
     {
+        if (!File.Exists(path))
+            return [];
+
         using var reader = new StreamReader(path);
 
         return TsvReader.Read<ConfigEntry>(reader).ToArray();
@@ -43,7 +46,7 @@ internal class StringArrayConverter : IConverter
             .Where(v => !string.IsNullOrWhiteSpace(v))
             .Select(v => v.Trim())
             .Select(v => v.ToLower())
-            .ToArrayOrNull();
+            .ToArray() ?? [];
     }
 
     public string Convert(object value, object row)

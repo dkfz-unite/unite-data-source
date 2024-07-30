@@ -17,7 +17,7 @@ public class FilesController : Controller
     public FilesController(ConfigOptions configOptions)
     {
         _configOptions = configOptions;
-        _filesCache = new HostFilesCache(Path.Combine(_configOptions.CachePath, "files.tsv"));
+        _filesCache = new HostFilesCache(Path.Combine(_configOptions.CachePath, "host-files.tsv"));
     }
 
     [HttpGet("{key}")]
@@ -27,7 +27,9 @@ public class FilesController : Controller
             
         if (System.IO.File.Exists(resourcePath))
         {
-            return PhysicalFile(resourcePath, "application/octet-stream", enableRangeProcessing: true);
+            var stream = new StreamReader(resourcePath).BaseStream;
+
+            return File(stream, "application/octet-stream", enableRangeProcessing: true);
         }
         else if (System.IO.Directory.Exists(resourcePath))
         {
@@ -44,12 +46,13 @@ public class FilesController : Controller
     [HttpGet("{key}/index")]
     public IActionResult GetIndex(string key)
     {
-        var resourcePath = _filesCache.Get(key);
-        var indexPath = Path.Combine(resourcePath, ".bai");
+        var resourcePath = GetPath(_configOptions.DataPath, _filesCache.Get(key)) + ".bai";
 
-        if (System.IO.File.Exists(indexPath))
+        if (System.IO.File.Exists(resourcePath))
         {
-            return PhysicalFile(indexPath, "application/octet-stream", enableRangeProcessing: true);
+            var stream = new StreamReader(resourcePath).BaseStream;
+
+            return File(stream, "application/octet-stream", enableRangeProcessing: true);
         }
         else
         {
@@ -88,6 +91,6 @@ public class FilesController : Controller
         if (string.IsNullOrWhiteSpace(dataPath))
             return filePath;
         
-        return filePath[dataPath.Length..];
+        return dataPath + filePath;
     }
 }

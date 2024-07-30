@@ -50,7 +50,16 @@ public class ExploringHandler
             foreach (var type in folderConfig.Types)
             {
                 var crawlerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "crawler");
+
+                if (!File.Exists(crawlerPath))
+                {
+                    _logger.LogWarning("Crawler '{path}' not found", crawlerPath);
+                    
+                    continue;
+                }
+
                 var crawlerProcess = PrepareProcess(crawlerPath, type, Path.Combine(_configOptions.DataPath, folderConfig.Path));
+
                 var crawlerOutput = await RunProcess(crawlerProcess);
 
                 var filesMetadata = TsvReader.Read<FileMetadata>(crawlerOutput).ToArray();
@@ -70,7 +79,16 @@ public class ExploringHandler
                     if (fileMetadata.Reader.StartsWith("cmd/"))
                     {
                         var readerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "readers", fileMetadata.Reader[4..]);
+
+                        if (!File.Exists(readerPath))
+                        {
+                            _logger.LogWarning("Reader '{path}' not found", readerPath);
+
+                            continue;
+                        }
+
                         var readerProcess = PrepareProcess(readerPath, fileMetadata.Path);
+
                         content += await RunProcess(readerProcess);
                     }
                     else
@@ -99,7 +117,6 @@ public class ExploringHandler
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Failed to upload file '{path}'", filePath);
-                    
                     }
                 }
             }
@@ -155,11 +172,13 @@ public class ExploringHandler
         var process = new Process();
 
         process.StartInfo.WorkingDirectory = Path.GetDirectoryName(path);
-        process.StartInfo.FileName = Path.GetFileName(path);
+        process.StartInfo.FileName = Path.GetFullPath(path);
         process.StartInfo.Arguments = string.Join(" ", arguments);
         process.StartInfo.UseShellExecute = false;
+        process.StartInfo.RedirectStandardInput = true;
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
+        process.StartInfo.CreateNoWindow = true;
 
         return process;
     }
@@ -175,7 +194,10 @@ public class ExploringHandler
 
         if (process.ExitCode > 0)
             throw new Exception(error);
-        
+
+        if (error.Length > 0)
+            Console.Error.WriteLine(error);
+            
         return output;
     }
 

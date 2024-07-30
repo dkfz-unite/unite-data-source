@@ -21,10 +21,4 @@ public class FileMetadata
     /// </summary>
     [Column("path")]
     public string Path { get; set; }
-
-
-    public override string ToString()
-    {
-        return string.Empty;
-    }
 }

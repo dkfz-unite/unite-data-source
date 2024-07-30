@@ -1,4 +1,6 @@
 using Unite.Data.Source.Web.Configuration.Options;
+using Unite.Data.Source.Web.Handlers;
+using Unite.Data.Source.Web.Workers;
 
 namespace Unite.Data.Source.Web.Configuration.Extensions;
 
@@ -8,6 +10,9 @@ public static class ConfigurationExtensions
     {
         services.AddOptions();
         services.AddValidators();
+
+        services.AddTransient<ExploringHandler>();
+        services.AddHostedService<ExploringWorker>();
     }
 
 
