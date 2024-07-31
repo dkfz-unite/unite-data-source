@@ -16,6 +16,7 @@ public class ExploringHandler
     
     private readonly string _configPath;
     private readonly FoundFilesCache _foundFilesCache;
+    private readonly FoundFilesCache _errorFilesCache;
     private readonly HostFilesCache _hostFilesCache;
 
 
@@ -32,6 +33,7 @@ public class ExploringHandler
 
         _configPath = Path.Combine(_configOptions.ConfigPath, "config.tsv");
         _foundFilesCache = new FoundFilesCache(Path.Combine(_configOptions.CachePath, "found-files.tsv"));
+        _errorFilesCache = new FoundFilesCache(Path.Combine(_configOptions.CachePath, "error-files.tsv"));
         _hostFilesCache = new HostFilesCache(Path.Combine(_configOptions.CachePath, "host-files.tsv"));
     }
 
@@ -71,7 +73,7 @@ public class ExploringHandler
                     var content = string.Empty;
                     var key = (string)null;
 
-                    if (_foundFilesCache.Contains(filePath))
+                    if (_foundFilesCache.Contains(filePath) || _errorFilesCache.Contains(filePath))
                     {
                         continue;
                     }
@@ -116,6 +118,8 @@ public class ExploringHandler
                     }
                     catch (Exception ex)
                     {
+                        _errorFilesCache.Add(filePath);
+
                         _logger.LogError(ex, "Failed to upload file '{path}'", filePath);
                     }
                 }
