@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 ENV ASPNETCORE_HTTP_PORTS=80
-WORKDIR /app
+WORKDIR /srv/app
 EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS restore
@@ -20,6 +20,6 @@ FROM build AS publish
 RUN dotnet publish --no-build "Unite.Data.Source.Web.csproj" -c Release -o /app/publish
 
 FROM base AS final
-WORKDIR /app
+WORKDIR /srv/app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Unite.Data.Source.Web.dll"]
