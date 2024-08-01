@@ -58,7 +58,7 @@ public class FeedOptions
         {
             var value = Environment.GetEnvironmentVariable("UNITE_SPECIMENS_FEED_HOST");
 
-            if (string.IsNullOrWhiteSpace(value) && !MainHostIsSet)
+            if (string.IsNullOrWhiteSpace(value))
             {
                 if (!MainHostIsSet)
                     throw new ArgumentNullException("'UNITE_SPECIMENS_FEED_HOST' environment variable has to be set");
@@ -76,7 +76,7 @@ public class FeedOptions
         {
             var value = Environment.GetEnvironmentVariable("UNITE_GENOME_FEED_HOST");
 
-            if (string.IsNullOrWhiteSpace(value) && !MainHostIsSet)
+            if (string.IsNullOrWhiteSpace(value))
             {
                 if (!MainHostIsSet)
                     throw new ArgumentNullException("'UNITE_GENOME_FEED_HOST' environment variable has to be set");

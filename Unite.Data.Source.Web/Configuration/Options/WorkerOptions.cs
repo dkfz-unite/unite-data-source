@@ -12,7 +12,7 @@ public class WorkerOptions
         {
             var value = Environment.GetEnvironmentVariable("UNITE_WORKER_HOST");
 
-            if (value == null)
+            if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentNullException("'UNITE_WORKER_HOST' environment variable has to be set");
 
             return value;
@@ -28,7 +28,7 @@ public class WorkerOptions
         {
             var value = Environment.GetEnvironmentVariable("UNITE_WORKER_TOKEN");
 
-            if (value == null)
+            if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentNullException("'UNITE_WORKER_TOKEN' environment variable has to be set");
 
             return value;

@@ -10,14 +10,14 @@ public class Resource
     [Column("format")]
     public string Format { get; set; }
 
-    [Column("path")]
-    public string Path { get; set; }
+    [Column("url")]
+    public string Url { get; set; }
 
 
-    public Resource(string type, string format, string path)
+    public Resource(string type, string format, string url)
     {
         Type = type;
         Format = format;
-        Path = path;
+        Url = url;
     }
 }
