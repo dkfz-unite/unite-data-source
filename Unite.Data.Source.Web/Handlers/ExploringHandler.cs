@@ -101,7 +101,8 @@ public class ExploringHandler
                     if (isResource)
                     {
                         key = Guid.NewGuid().ToString();
-                        var resource = new Resource(type, fileMetadata.Format, filePath);
+                        var url = $"{_workerOptions.Host}/api/files/{key}";
+                        var resource = new Resource(type, fileMetadata.Format, url);
                         content += Environment.NewLine + TsvWriter.Write([resource]);
                     }
 
