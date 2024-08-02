@@ -2,9 +2,9 @@
 
 ## General
 Data source service provides the following functionality:
-- Uses custom crawlers to find required files.
-- Uses custom readers to read the files.
-- Hosts required files, and provides protected API to access them by a url.
+- Uses custom [crawlers](./Docs/crawler.md) to find required files.
+- Uses custom [readers](./Docs/reader.md) to read the files.
+- Hosts required files, and provides protected [web API](./Docs/api.md) to access them by a url.
 
 ## Access
 Environment|Address|Port

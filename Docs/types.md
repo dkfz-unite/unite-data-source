@@ -26,11 +26,11 @@ Data types are the types of data UNITE can work with.
 
 ## Resources
 Resource is a file, which has to be hosted on the server and can be later accessed by the url.  
-Such files are usually to big to be directly uploaded to application server and integrated with other data, but still need to be accessible.
+Such files are usually to big to be directly uploaded to UNITE portal and integrated with other data, but still need to be accessible.
 
 Application automatically hosts files of the following data types as resources:
-- All genomic samples - `dna`, `rna`, `rnasc` (e.g. BAM files of sequencing samples).
-- Single cell RNA expressions - `rnasc-exp` (e.g. MEX files of single cell gene expressions from 10xGenomics).
+- All genomic samples - `dna`, `rna`, `rnasc` (e.g. `.bam` files of sequencing samples).
+- Single cell RNA expressions - `rnasc-exp` (e.g. `.mtx` files of single cell gene expressions from 10xGenomics).
 
 > [!Note]
 > If you don't want such files to be hosted as resources, exclude them from [crawlers](crawler.md) output.
