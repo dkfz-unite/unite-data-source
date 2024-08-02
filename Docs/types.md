@@ -34,3 +34,11 @@ Application automatically hosts files of the following data types as resources:
 
 > [!Note]
 > If you don't want such files to be hosted as resources, exclude them from [crawlers](crawler.md) output.
+
+### Access
+If a file was hosted by the application as a resource, the application will generate a unique key for it and send to UNITE portal with file metadata.  
+File can be later accessed by this key sending a request to corresponding [web API](./api.md) endpoint:
+- Ordinary file - [file](./api.md#get-apifilekey) endpoint.
+- Binary alignment map (BAM) file - [bam](./api.md#get-apibamkey) endpoint, if the file was provided in a `bam` format.
+- 10xGenomics single cell RNA expressions matrix file - [mtx](./api.md#get-apimtxkey) endpoint, if the file was provided in a `mtx` format.
+
