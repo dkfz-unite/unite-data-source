@@ -68,12 +68,10 @@ public class ExploringHandler
 
                 foreach (var fileMetadata in filesMetadata)
                 {
-                    var filePath = GetPath(_configOptions.DataPath, fileMetadata.Path);
-                    var isResource = IsResourceType(type);
+                    var path = GetPath(_configOptions.DataPath, fileMetadata.Path);
                     var content = string.Empty;
-                    var key = (string)null;
 
-                    if (_foundFilesCache.Contains(filePath) || _errorFilesCache.Contains(filePath))
+                    if (_foundFilesCache.Contains(path) || _errorFilesCache.Contains(path))
                     {
                         continue;
                     }
@@ -98,30 +96,44 @@ public class ExploringHandler
                         content += await File.ReadAllTextAsync(fileMetadata.Path);
                     }
 
-                    if (isResource)
+                    if (IsResourceType(type))
                     {
-                        key = Guid.NewGuid().ToString();
-                        var url = $"{_workerOptions.Host}/api/files/{key}";
+                        var key = Guid.NewGuid().ToString();
+
+                        var url = fileMetadata.Format == "bam" ? $"{_workerOptions.Host}/api/bam/{key}"
+                                : fileMetadata.Format == "mtx" ? $"{_workerOptions.Host}/api/mtx/{key}"
+                                : $"{_workerOptions.Host}/api/file/{key}";
+
                         var resource = new Resource(type, fileMetadata.Format, url);
+
                         content += Environment.NewLine + TsvWriter.Write([resource]);
-                    }
 
-                    try
-                    {
-                        UploadFileContent(type, content);
-
-                        if (isResource)
+                        try
                         {
-                            _hostFilesCache.Add(key, filePath);
+                            UploadFileContent(type, content);
+
+                            _hostFilesCache.Add(key, path);
+                            _foundFilesCache.Add(path);
                         }
-
-                        _foundFilesCache.Add(filePath);
+                        catch (Exception ex)
+                        {
+                            _errorFilesCache.Add(path);
+                            _logger.LogError(ex, "Failed to upload file '{path}'", path);
+                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        _errorFilesCache.Add(filePath);
+                        try
+                        {
+                            UploadFileContent(type, content);
 
-                        _logger.LogError(ex, "Failed to upload file '{path}'", filePath);
+                            _foundFilesCache.Add(path);
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorFilesCache.Add(path);
+                            _logger.LogError(ex, "Failed to upload file '{path}'", path);
+                        }
                     }
                 }
             }

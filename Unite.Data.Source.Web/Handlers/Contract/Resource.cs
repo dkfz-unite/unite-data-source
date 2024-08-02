@@ -12,7 +12,7 @@ public class Resource
 
     [Column("url")]
     public string Url { get; set; }
-
+    
 
     public Resource(string type, string format, string url)
     {

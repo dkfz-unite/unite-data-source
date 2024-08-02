@@ -28,9 +28,14 @@ format  reader  path
 tsv def /mnt/data/file1.tsv
 vcf cmd/ssm /mnt/data/file2.vcf
 ```
-- `format` - File format.
+- `format` - File [format](#format).
 - `reader` - File reader (`def` for default or `cmd/{name}` of the **custom** reader).
 - `path` -  **Absolute** path to the file found by the crawler.
+
+### Format
+The file can be in any format, but some of the formats for certain data types will be treated differently by the application.
+Format should be passed as an **extension** of the file in **lowercase**, **without** the leading **dot**, e.g.: `tsv`, `vcf`, `bam`, `mtx`.
+Files of certain data types will be hosted by the application as [resources](./types.md#resources).
 
 ### Default Readers
 If the reader is default (`def`), the application exprects, that the file is in standard UNITE **tsv** format for the corresponding data type.
