@@ -53,6 +53,8 @@ public class ExploringHandler
 
             foreach (var type in folderConfig.Types)
             {
+                var crawlerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "crawler");
+
                 if (!File.Exists(crawlerPath))
                 {
                     _logger.LogWarning("Crawler '{path}' not found", crawlerPath);
