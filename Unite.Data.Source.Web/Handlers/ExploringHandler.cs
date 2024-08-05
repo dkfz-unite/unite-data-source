@@ -148,7 +148,12 @@ public class ExploringHandler
 
     private void UploadFileContent(string type, string content)
     {
-        using var client = new HttpClient();
+        var handler = new HttpClientHandler
+        {
+            UseProxy = false
+        };
+
+        using var client = new HttpClient(handler);
 
         var url = type switch
         {
