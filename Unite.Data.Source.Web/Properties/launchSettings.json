@@ -14,7 +14,7 @@
       "launchUrl": "api",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "UNITE_AUTH_KEY": "Defautl32BitApiKeyHasToBeChanged",
+        "UNITE_API_KEY": "Defautl32BitApiKeyHasToBeChanged",
         "UNITE_WORKER_HOST": "http://localhost:5300",
         "UNITE_WORKER_TOKEN": "DefaultJWTApiTokenHasToBeChanged",
         "UNITE_PORTAL_HOST": "http://localhost",
@@ -33,7 +33,7 @@
       "applicationUrl": "http://localhost:5300",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "UNITE_AUTH_KEY": "Defautl32BitApiKeyHasToBeChanged",
+        "UNITE_API_KEY": "Defautl32BitApiKeyHasToBeChanged",
         "UNITE_WORKER_HOST": "http://localhost:5300",
         "UNITE_WORKER_TOKEN": "DefaultJWTApiTokenHasToBeChanged",
         "UNITE_PORTAL_HOST": "http://localhost",
