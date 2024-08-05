@@ -186,8 +186,6 @@ public class ExploringHandler
         
         request.Content = new StringContent(content, Encoding.UTF8, "text/tab-separated-values");
 
-        _logger.LogInformation("Uploading:\n{content}\nTo:{url}", content, url);
-
         var result = client.SendAsync(request).Result;
 
         if (!result.IsSuccessStatusCode)
