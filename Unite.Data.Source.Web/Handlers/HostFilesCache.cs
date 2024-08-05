@@ -8,8 +8,6 @@ public class HostFilesCache
 
     public HostFilesCache(string path)
     {
-        Console.WriteLine($"Creating cache at {path}");
-
         var folderPath = Path.GetDirectoryName(path);
         var filePath = path;
 
