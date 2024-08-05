@@ -73,6 +73,7 @@ public class ExploringHandler
                 foreach (var fileMetadata in filesMetadata)
                 {
                     var path = GetPath(_configOptions.DataPath, fileMetadata.Path);
+
                     var content = string.Empty;
 
                     if (_foundFilesCache.Contains(path) || _errorFilesCache.Contains(path))
@@ -110,7 +111,7 @@ public class ExploringHandler
 
                         var resource = new Resource(type, fileMetadata.Format, url);
 
-                        content += Environment.NewLine + TsvWriter.Write([resource]);
+                        content += Merge(content, TsvWriter.Write([resource]));
 
                         try
                         {
@@ -122,7 +123,7 @@ public class ExploringHandler
                         catch (Exception ex)
                         {
                             _errorFilesCache.Add(path);
-                            _logger.LogError(ex, "Failed to upload and host file '{path}'", path);
+                            _logger.LogError(ex, "Failed to upload and host file '{path}'\n{message}", path, ex.Message);
                         }
                     }
                     else
@@ -136,7 +137,7 @@ public class ExploringHandler
                         catch (Exception ex)
                         {
                             _errorFilesCache.Add(path);
-                            _logger.LogError(ex, "Failed to upload file '{path}'", path);
+                            _logger.LogError(ex, "Failed to upload file '{path}'\n{message}", path, ex.Message);
                         }
                     }
                 }
@@ -189,8 +190,9 @@ public class ExploringHandler
 
         if (!result.IsSuccessStatusCode)
         {
-            _logger.LogWarning("Uploading to '{url}' resulted in `{code}`", url, result.StatusCode);
-            // throw new Exception($"Failed to upload file content to '{url}'");
+            var error = $"Uploading to '{url}' resulted in '{result.StatusCode}'\n{result.Content.ReadAsStringAsync().Result}";
+
+            throw new Exception(error);
         }
     }
 
@@ -246,5 +248,13 @@ public class ExploringHandler
             DataTypes.Genome.Rnasc.Exp => true,
             _ => false
         };
+    }
+
+    private static string Merge(string metadata, string data)
+    {
+        if (metadata.EndsWith(Environment.NewLine))
+            return metadata + data;
+        else
+            return metadata + Environment.NewLine + data;
     }
 }
