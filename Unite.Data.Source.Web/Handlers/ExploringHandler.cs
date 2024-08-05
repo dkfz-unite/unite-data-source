@@ -111,7 +111,7 @@ public class ExploringHandler
 
                         var resource = new Resource(type, fileMetadata.Format, url);
 
-                        content += Merge(content, TsvWriter.Write([resource]));
+                        content = Merge(content, TsvWriter.Write([resource]));
 
                         try
                         {
@@ -123,7 +123,7 @@ public class ExploringHandler
                         catch (Exception ex)
                         {
                             _errorFilesCache.Add(path);
-                            _logger.LogError(ex, "Failed to upload and host file '{path}'\n{message}", path, ex.Message);
+                            _logger.LogError(ex, "Failed to upload and host file '{path}'", path);
                         }
                     }
                     else
@@ -137,7 +137,7 @@ public class ExploringHandler
                         catch (Exception ex)
                         {
                             _errorFilesCache.Add(path);
-                            _logger.LogError(ex, "Failed to upload file '{path}'\n{message}", path, ex.Message);
+                            _logger.LogError(ex, "Failed to upload file '{path}'", path);
                         }
                     }
                 }
