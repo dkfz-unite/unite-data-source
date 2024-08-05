@@ -189,7 +189,8 @@ public class ExploringHandler
 
         if (!result.IsSuccessStatusCode)
         {
-            throw new Exception($"Failed to upload file content to '{url}'");
+            _logger.LogWarning("Uploading to '{url}' resulted in `{code}`", url, result.StatusCode);
+            // throw new Exception($"Failed to upload file content to '{url}'");
         }
     }
 
