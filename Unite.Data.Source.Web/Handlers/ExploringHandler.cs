@@ -109,7 +109,7 @@ public class ExploringHandler
                                 : fileMetadata.Format == "mtx" ? $"{_workerOptions.Host}/api/mtx/{key}"
                                 : $"{_workerOptions.Host}/api/file/{key}";
 
-                        var resource = new Resource(type, fileMetadata.Format, url);
+                        var resource = new Resource(type, fileMetadata.Format, fileMetadata.Archive, url);
 
                         content = Merge(content, TsvWriter.Write([resource]));
 
