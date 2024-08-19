@@ -11,7 +11,7 @@ RUN dotnet nuget add source https://nuget.pkg.github.com/dkfz-unite/index.json -
 COPY ["Unite.Data.Source.Web/Unite.Data.Source.Web.csproj", "Unite.Data.Source.Web/"]
 RUN dotnet restore "Unite.Data.Source.Web/Unite.Data.Source.Web.csproj"
 
-FROM restore as build
+FROM restore AS build
 COPY . .
 WORKDIR "/src/Unite.Data.Source.Web"
 RUN dotnet build --no-restore "Unite.Data.Source.Web.csproj" -c Release
