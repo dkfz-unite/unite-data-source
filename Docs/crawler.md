@@ -28,8 +28,9 @@ format  reader  path
 tsv def /mnt/data/file1.tsv
 vcf cmd/ssm /mnt/data/file2.vcf
 ```
-- `format` - File [format](#format).
 - `reader` - File reader (`def` for default or `cmd/{name}` of the **custom** reader).
+- `format` - File [format](#format).
+- `archive` - Archive type **if** the file **is archived** (`zip`, `tar`, `gz`, etc.).
 - `path` -  **Absolute** path to the file found by the crawler.
 
 ### Format
