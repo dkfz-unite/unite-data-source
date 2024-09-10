@@ -40,21 +40,21 @@ public static class Urls
         public static class Dna
         {
             public const string Sample = $"dna/sample/{_format}"; // DNA samples
-            public const string Ssm = $"dna/analysis/ssm/{_format}"; // SSMs
-            public const string Cnv = $"dna/analysis/cnv/{_format}"; // CNVs
-            public const string Sv = $"dna/analysis/sv/{_format}"; // SVs
+            public const string Ssm = $"dna/analysis/ssms/{_format}"; // SSMs
+            public const string Cnv = $"dna/analysis/cnvs/{_format}"; // CNVs
+            public const string Sv = $"dna/analysis/svs/{_format}"; // SVs
         }
 
         public static class Rna
         {
             public const string Sample = $"rna/sample/{_format}"; // Bulk RNA sample
-            public const string Exp = $"rna/analysis/exp/{_format}"; // Bulk RNA expressions
+            public const string Exp = $"rna/analysis/exps/{_format}"; // Bulk RNA expressions
         }
 
         public static class Rnasc
         {
             public const string Sample = $"rnasc/sample/{_format}"; // Single cell RNA sample
-            public const string Exp = $"rnasc/analysis/exp/{_format}"; // Single cell RNA expressions
+            public const string Exp = $"rnasc/analysis/exps/{_format}"; // Single cell RNA expressions
         }
     }
 }
