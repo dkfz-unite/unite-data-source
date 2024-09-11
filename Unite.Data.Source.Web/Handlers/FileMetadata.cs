@@ -31,5 +31,14 @@ public class FileMetadata
     /// Path to the file or folder with the data.
     /// </summary>
     [Column("path")]
-    public string Path { get => _path?.Trim(); set => _path = value; }
+    public string Path { get => GetPath(_path); set => _path = value; }
+
+
+    private static string GetPath(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+
+        return $"\"{value.Trim()}\"";
+    }
 }
