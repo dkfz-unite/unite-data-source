@@ -124,6 +124,7 @@ public class ExploringHandler
                         {
                             _errorFilesCache.Add(path);
                             _logger.LogError(ex, "Failed to upload and host file '{path}'", path);
+                            _logger.LogError("{content}", content);
                         }
                     }
                     else
