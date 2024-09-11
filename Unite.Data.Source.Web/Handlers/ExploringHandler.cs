@@ -87,6 +87,7 @@ public class ExploringHandler
 
                         if (!File.Exists(readerPath))
                         {
+                            _errorFilesCache.Add(path);
                             _logger.LogWarning("Reader '{path}' not found", readerPath);
 
                             continue;
@@ -95,10 +96,26 @@ public class ExploringHandler
                         var readerProcess = PrepareProcess(readerPath, fileMetadata.Path);
 
                         content += await RunProcess(readerProcess);
+
+                        if (string.IsNullOrWhiteSpace(content))
+                        {
+                            _errorFilesCache.Add(path);
+                            _logger.LogError("Failed to read file '{path}'", path);
+
+                            continue;
+                        }
                     }
                     else
                     {
                         content += await File.ReadAllTextAsync(fileMetadata.Path);
+
+                        if (string.IsNullOrWhiteSpace(content))
+                        {
+                            _errorFilesCache.Add(path);
+                            _logger.LogError("Failed to read file '{path}'", path);
+
+                            continue;
+                        }
                     }
 
                     if (IsResourceType(type))
