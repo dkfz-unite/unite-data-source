@@ -39,6 +39,6 @@ public class FileMetadata
         if (string.IsNullOrWhiteSpace(value))
             return null;
 
-        return $"\"{value.Trim()}\"";
+        return value.Trim().Replace(" ", "\\ ");
     }
 }
