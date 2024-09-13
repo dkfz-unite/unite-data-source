@@ -93,7 +93,7 @@ public class ExploringHandler
                             continue;
                         }
 
-                        var readerProcess = PrepareProcess(readerPath, fileMetadata.Path);
+                        var readerProcess = PrepareProcess(readerPath, $"\"{fileMetadata.Path}\"");
 
                         content += await RunProcess(readerProcess);
 
