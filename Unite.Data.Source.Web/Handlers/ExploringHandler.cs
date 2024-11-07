@@ -68,7 +68,7 @@ public class ExploringHandler
 
                 var filesMetadata = TsvReader.Read<FileMetadata>(crawlerOutput).ToArray();
 
-                _logger.LogInformation("Found {count} files of type '{type}'", filesMetadata.Length, type);
+                // _logger.LogInformation("Found {count} files of type '{type}'", filesMetadata.Length, type);
 
                 foreach (var fileMetadata in filesMetadata)
                 {
@@ -80,6 +80,8 @@ public class ExploringHandler
                     {
                         continue;
                     }
+
+                    _logger.LogInformation("New '{type}' file '.../{path}'", type, path);
 
                     if (fileMetadata.Reader.StartsWith("cmd/"))
                     {
