@@ -49,7 +49,7 @@ public class ExploringHandler
 
         foreach (var folderConfig in folderConfigs)
         {
-            _logger.LogInformation("Exploring folder '{path}'", folderConfig.Path);
+            // _logger.LogInformation("Exploring folder '{path}'", folderConfig.Path);
 
             foreach (var type in folderConfig.Types)
             {
