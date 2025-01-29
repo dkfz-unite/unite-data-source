@@ -4,7 +4,7 @@ using Unite.Data.Source.Web.Configuration.Options;
 
 namespace Unite.Data.Source.Web.Controllers;
 
-[Authorize]
+// [Authorize]
 [Route("api/mtx")]
 public class MtxController : FileController
 {

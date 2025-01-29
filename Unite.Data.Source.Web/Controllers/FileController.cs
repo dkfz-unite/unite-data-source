@@ -5,7 +5,7 @@ using Unite.Data.Source.Web.Handlers;
 
 namespace Unite.Data.Source.Web.Controllers;
 
-[Authorize]
+// [Authorize]
 [Route("api/file")]
 public class FileController : Controller
 {
