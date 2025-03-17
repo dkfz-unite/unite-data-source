@@ -21,6 +21,7 @@ public static class DataTypes
     // rna-exp
     // rnasc
     // rnasc-exp
+    // dna-meth
 
     public static class Donor
     {
@@ -61,6 +62,7 @@ public static class DataTypes
             public const string Ssm = "dna-ssm"; // SSMs
             public const string Cnv = "dna-cnv"; // CNVs
             public const string Sv = "dna-sv"; // SVs
+            public const string Meth = "dna-meth"; // Methylation
         }
 
         public static class Rna
