@@ -124,12 +124,9 @@ public class ExploringHandler
                     {
                         var key = Guid.NewGuid().ToString();
 
-                        var url = fileMetadata.Format == "bam" ? $"{_workerOptions.Host}/api/bam/{key}"
-                                : fileMetadata.Format == "mtx" ? $"{_workerOptions.Host}/api/mtx/{key}"
-                                : fileMetadata.Format == "idat" ? $"{_workerOptions.Host}/api/idat/{key}"
-                                : $"{_workerOptions.Host}/api/file/{key}";
+                        var url = $"{_workerOptions.Host}/api/file/{key}";
 
-                        var resource = new Resource(type, fileMetadata.Format, fileMetadata.Archive, url);
+                        var resource = new Resource(fileMetadata.Name, type, fileMetadata.Format, fileMetadata.Archive, url);
 
                         content = Merge(content, TsvWriter.Write([resource]));
 
@@ -195,7 +192,8 @@ public class ExploringHandler
             DataTypes.Genome.Dna.Ssm => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Ssm}?review=false",
             DataTypes.Genome.Dna.Cnv => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Cnv}?review=false",
             DataTypes.Genome.Dna.Sv => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Sv}?review=false",
-            DataTypes.Genome.Dna.Meth => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Meth}?review=false",
+            DataTypes.Genome.Meth.Sample => $"{_feedOptions.GenomeHost}/{Urls.Genome.Meth.Sample}?review=false",
+            DataTypes.Genome.Meth.Level => $"{_feedOptions.GenomeHost}/{Urls.Genome.Meth.Level}?review=false",
             DataTypes.Genome.Rna.Sample => $"{_feedOptions.GenomeHost}/{Urls.Genome.Rna.Sample}?review=false",
             DataTypes.Genome.Rna.Exp => $"{_feedOptions.GenomeHost}/{Urls.Genome.Rna.Exp}?review=false",
             DataTypes.Genome.Rnasc.Sample => $"{_feedOptions.GenomeHost}/{Urls.Genome.Rnasc.Sample}?review=false",
@@ -266,10 +264,12 @@ public class ExploringHandler
         return type switch
         {
             DataTypes.Genome.Dna.Sample => true,
+            DataTypes.Genome.Meth.Sample => true,
+            DataTypes.Genome.Meth.Level => true,
             DataTypes.Genome.Rna.Sample => true,
             DataTypes.Genome.Rnasc.Sample => true,
             DataTypes.Genome.Rnasc.Exp => true,
-            DataTypes.Genome.Dna.Meth => true,
+            
             _ => false
         };
     }
