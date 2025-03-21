@@ -17,6 +17,8 @@ public static class DataTypes
     // dna-ssm
     // dna-cnv
     // dna-sv
+    // meth
+    // meth-lvl
     // rna
     // rna-exp
     // rnasc
@@ -61,6 +63,12 @@ public static class DataTypes
             public const string Ssm = "dna-ssm"; // SSMs
             public const string Cnv = "dna-cnv"; // CNVs
             public const string Sv = "dna-sv"; // SVs
+        }
+
+        public static class Meth
+        {
+            public const string Sample = "meth"; // Methylation samples (fasta, fastq, mab, idat)
+            public const string Level = "meth-lvl"; // Methylation levels (beta and/or M-values)
         }
 
         public static class Rna
