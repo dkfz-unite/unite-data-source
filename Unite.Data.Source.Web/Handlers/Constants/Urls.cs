@@ -45,6 +45,12 @@ public static class Urls
             public const string Sv = $"dna/analysis/sv/{_format}"; // SVs
         }
 
+        public static class Meth
+        {
+            public const string Sample = $"meth/sample/{_format}"; // DNA Methylation samples
+            public const string Level = $"meth/analysis/levels/{_format}"; // DNA Methylation levels
+        }
+
         public static class Rna
         {
             public const string Sample = $"rna/sample/{_format}"; // Bulk RNA sample

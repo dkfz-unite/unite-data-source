@@ -4,10 +4,18 @@ namespace Unite.Data.Source.Web.Handlers;
 
 public class FileMetadata
 {
+    private string _name;
     private string _reader;
     private string _format;
     private string _archive;
     private string _path;
+
+
+    /// <summary>
+    /// Name of the file.
+    /// </summary>
+    [Column("name")]
+    public string Name { get => _name?.Trim(); set => _name = value; }
 
     /// <summary>
     /// Type of the reader to read the file content (cmd/ssm, cmd/cnv, cmd/sv, cmd/exp, etc.).
