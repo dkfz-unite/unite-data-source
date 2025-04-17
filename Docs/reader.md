@@ -20,7 +20,7 @@ Application should output to the console the content of the file (with required 
 Please refer to the data types [documentation](./types.md) for the list of available data types.
 
 ### Example
-If the reader should read the file `/mnt/data/file2.vcf` with `dna-ssm` data, the output should look as following:
+If the reader should read the file `/mnt/data/file2.vcf` with `dna-sm` data, the output should look as following:
 ```tsv
 # tsample_donor_id: D01
 # tsample_specimen_id: S02

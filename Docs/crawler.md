@@ -16,9 +16,9 @@ Application should accept **two** arguments:
 Please refer to the data types [documentation](./types.md) for the list of available data types.
 
 ### Example
-If the crawler should look for files with `dna-ssm` data in folder `/mnt/data`, the command to run the crawler should look as following:
+If the crawler should look for files with `dna-sm` data in folder `/mnt/data`, the command to run the crawler should look as following:
 ```bash
-./crawler dna-ssm /mnt/data
+./crawler dna-sm /mnt/data
 ```
 
 ## Output
@@ -26,7 +26,7 @@ Application should output to the console **tsv** list of files of the required d
 ```tsv
 format  reader  path
 tsv def /mnt/data/file1.tsv
-vcf cmd/ssm /mnt/data/file2.vcf
+vcf cmd/sm /mnt/data/file2.vcf
 ```
 - `reader` - File reader (`def` for default or `cmd/{name}` of the **custom** reader).
 - `format` - File [format](#format).
@@ -42,7 +42,7 @@ Files of certain data types will be hosted by the application as [resources](./t
 If the reader is default (`def`), the application exprects, that the file is in standard UNITE **tsv** format for the corresponding data type.
 
 #### Example
-If the crawler found the file `/mnt/data/file1.tsv` with `dna-ssm` data, which should be read by default reader, the output should look as following:
+If the crawler found the file `/mnt/data/file1.tsv` with `dna-sm` data, which should be read by default reader, the output should look as following:
 ```tsv
 format  reader  path
 tsv def /mnt/data/file1.tsv
@@ -53,18 +53,18 @@ If the reader is custom (`cmd/{name}`), the application expects, that the reader
 Please refer to the readers [documentation](./reader.md) for more information.
 
 #### Example
-If the crawler found the file `/mnt/data/file2.vcf` with `dna-ssm` data, which should be read by custom reader `ssm`, the output should look as following:
+If the crawler found the file `/mnt/data/file2.vcf` with `dna-sm` data, which should be read by custom reader `sm`, the output should look as following:
 ```tsv
 format  reader  path
-vcf cmd/ssm /mnt/data/file2.vcf
+vcf cmd/sm /mnt/data/file2.vcf
 ```
 
-The custom reader `ssm` should be placed in the `readers` folder of corresponding crawler.
+The custom reader `sm` should be placed in the `readers` folder of corresponding crawler.
 ```txt
 - /srv/config
     config.tsv
     - my-crawler
         crawler
         - readers
-            ssm
+            sm
 ```

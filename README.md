@@ -42,7 +42,7 @@ Please, read [crawlers](./Docs/crawler.md) documentation to understand how to cr
 To configure the crawlers, create a configuration file `config.tsv` in the configuration folder ('UNITE_CONFIG_PATH') with the following structure:
 ```tsv
 folder  crawler types
-my/folder   my-crawler  dna, dna-ssm, dna-cnv, dna-sv
+my/folder   my-crawler  dna, dna-sm, dna-cnv, dna-sv
 ```
 
 - `folder` - Relative (if `UNITE_DATA_PATH` is set) or absolute path to the folder where the crawler should look for files.
@@ -105,9 +105,9 @@ my/folder   my-crawler  dna, dna-ssm, dna-cnv, dna-sv
     E.g. you have one crawler `org` which should look for files with genomic data of different types in different project folders relative to configured `/data` root folder:
         ```tsv
         folder  crawler types
-        org/proj_a    org dna, dna-ssm, dna-cnv, dna-sv, rna, rna-exp
-        org/proj_b    org dna, dna-ssm, dna-cnv, dna-sv, rna, rna-exp
-        org/proj_c    org dna, dna-ssm, dna-cnv, dna-sv, rna, rna-exp
+        org/proj_a    org dna, dna-sm, dna-cnv, dna-sv, rna, rna-exp
+        org/proj_b    org dna, dna-sm, dna-cnv, dna-sv, rna, rna-exp
+        org/proj_c    org dna, dna-sm, dna-cnv, dna-sv, rna, rna-exp
         ```
     - Put created configuration, required crawler and it's data readers to configuration folder to have the following structure:
         ```txt
@@ -118,18 +118,18 @@ my/folder   my-crawler  dna, dna-ssm, dna-cnv, dna-sv
                 - org
                     crawler
                     - readers
-                        ssm
+                        sm
                         cnv
                         sv
                         exp
         ```
 
 8) Application will do the folling:
-    - Use the crawler `org` and run it for every listed (`dna`, `dna-ssm`, `dna-cnv`, `dna-sv`, `rna`, `rna-exp`) data type to find corresponding files in configured project folders relative to configured `/data/` folder: `/data/org/proj_a`, `/data/org/proj_b`, `/data/org/proj_c`.
+    - Use the crawler `org` and run it for every listed (`dna`, `dna-sm`, `dna-cnv`, `dna-sv`, `rna`, `rna-exp`) data type to find corresponding files in configured project folders relative to configured `/data/` folder: `/data/org/proj_a`, `/data/org/proj_b`, `/data/org/proj_c`.
     - If the found file is of a resource data [type](./Docs/types.md#resources) (e.g. DAM file):
         - File metadata will be sent to UNITE Portal with newly generated file key (e.g. `1234567890`).
         - File will be hosted by the application and will be accessible by the public application url: `http://source.data.unite.net/api/files/1234567890`.
-    - If the found file contains data (e.g. DNA ssm data):
+    - If the found file contains data (e.g. DNA sm data):
         - Corresponding reader will be used to read the content of the file.
         - File data and it's metadata will be sent to UNITE Portal for further processing and integration.
 

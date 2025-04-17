@@ -179,7 +179,7 @@ public class ExploringHandler
         {
             DataTypes.Donor.Entry => $"{_feedOptions.DonorsHost}/{Urls.Donor.Entry}?review=false",
             DataTypes.Donor.Treatment => $"{_feedOptions.DonorsHost}/{Urls.Donor.Treatment}?review=false",
-            DataTypes.Image.Entry.Mri => $"{_feedOptions.ImagesHost}/{Urls.Image.Entry.Mri}?review=false",
+            DataTypes.Image.Entry.Mr => $"{_feedOptions.ImagesHost}/{Urls.Image.Entry.Mr}?review=false",
             DataTypes.Image.Entry.Ct => $"{_feedOptions.ImagesHost}/{Urls.Image.Entry.Ct}?review=false",
             DataTypes.Image.Feature => $"{_feedOptions.ImagesHost}/{Urls.Image.Feature}?review=false",
             DataTypes.Specimen.Entry.Material => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Entry.Material}?review=false",
@@ -189,7 +189,7 @@ public class ExploringHandler
             DataTypes.Specimen.Intervention => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Intervention}?review=false",
             DataTypes.Specimen.Drug => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Drug}?review=false",
             DataTypes.Genome.Dna.Sample => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Sample}?review=false",
-            DataTypes.Genome.Dna.Ssm => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Ssm}?review=false",
+            DataTypes.Genome.Dna.Sm => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Sm}?review=false",
             DataTypes.Genome.Dna.Cnv => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Cnv}?review=false",
             DataTypes.Genome.Dna.Sv => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Sv}?review=false",
             DataTypes.Genome.Meth.Sample => $"{_feedOptions.GenomeHost}/{Urls.Genome.Meth.Sample}?review=false",

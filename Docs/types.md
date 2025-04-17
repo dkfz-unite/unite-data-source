@@ -5,7 +5,7 @@ Data types are the types of data UNITE can work with.
     - [don](https://github.com/dkfz-unite/unite-donors-feed/blob/main/Docs/api-models-donors.md) - donors general and clinical data.
     - [don-trt](https://github.com/dkfz-unite/unite-donors-feed/blob/main/Docs/api-models-treatments.md) - donors treatments data.
 - Images
-    - [mri](https://github.com/dkfz-unite/unite-images-feed/blob/main/Docs/api-models-mris.md) - MRI images data.
+    - [mr](https://github.com/dkfz-unite/unite-images-feed/blob/main/Docs/api-models-mrs.md) - MR images data.
     - [img-rad](https://github.com/dkfz-unite/unite-images-feed/blob/main/Docs/api-models-radiomics.md) - image radiomics features data.
 - Specimens
     - [mat](https://github.com/dkfz-unite/unite-specimens-feed/blob/main/Docs/api-models-material.md) - all donor derived materials data.
@@ -16,7 +16,7 @@ Data types are the types of data UNITE can work with.
     - [spe-drg](https://github.com/dkfz-unite/unite-specimens-feed/blob/main/Docs/api-models-drugs.md) - specimen drugs screening data.
 - Genomic
     - [dna](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-sample.md) - DNA sample data.
-    - [dna-ssm](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-dna-ssm.md) - DNA Simple Somatic Mutations data.
+    - [dna-sm](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-dna-sm.md) - DNA Simple Mutations data.
     - [dna-cnv](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-dna-cnv.md) - DNA Copy Number Variants data.
     - [dna-sv](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-dna-sv.md) - DNA Structural Variants data.
     - [rna](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-sample.md) - **bulk** RNA sample data.

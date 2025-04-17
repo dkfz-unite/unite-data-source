@@ -13,7 +13,7 @@ public class ConfigEntry
     public string Crawler { get; set; }
 
     /// <summary>
-    /// Types of the data to be found by the crawler (e.g. dna, dna/ssm, dna/cnv, dna/sv, rna, rna/exp, rnasc, rnasc/exp, etc.).
+    /// Types of the data to be found by the crawler (e.g. dna, dna/sm, dna/cnv, dna/sv, rna, rna/exp, rnasc, rnasc/exp, etc.).
     /// </summary>
     [Column("types", typeof(StringArrayConverter))]
     public string[] Types { get; set; }
