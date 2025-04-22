@@ -18,7 +18,7 @@ public class FileMetadata
     public string Name { get => _name?.Trim(); set => _name = value; }
 
     /// <summary>
-    /// Type of the reader to read the file content (cmd/ssm, cmd/cnv, cmd/sv, cmd/exp, etc.).
+    /// Type of the reader to read the file content (cmd/sm, cmd/cnv, cmd/sv, cmd/exp, etc.).
     /// </summary>
     [Column("reader")] 
     public string Reader { get => _reader?.Trim().ToLower(); set => _reader = value; }

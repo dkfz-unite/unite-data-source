@@ -4,7 +4,7 @@ public static class DataTypes
 {
     // don
     // dont-trt
-    // mri
+    // mr
     // ct
     // img-rad
     // mat
@@ -14,7 +14,7 @@ public static class DataTypes
     // spe-int
     // spe-drg
     // dna
-    // dna-ssm
+    // dna-ss
     // dna-cnv
     // dna-sv
     // meth
@@ -34,7 +34,7 @@ public static class DataTypes
     {
         public static class Entry
         {
-            public const string Mri = "mri"; // MRIs
+            public const string Mr = "mr"; // MRs
             public const string Ct = "ct"; // CTs
         }
 
@@ -60,7 +60,7 @@ public static class DataTypes
         public static class Dna
         {
             public const string Sample = "dna"; // DNA samples
-            public const string Ssm = "dna-ssm"; // SSMs
+            public const string Sm = "dna-sm"; // SMs
             public const string Cnv = "dna-cnv"; // CNVs
             public const string Sv = "dna-sv"; // SVs
         }

@@ -19,14 +19,14 @@ public class FeedOptions
     {
         get
         {
-            var value = Environment.GetEnvironmentVariable("UNITE_DONORS_FEED_HOST");
+            var value = Environment.GetEnvironmentVariable("UNITE_FEED_DONORS_HOST");
 
             if (string.IsNullOrWhiteSpace(value))
             {
                 if (!MainHostIsSet)
-                    throw new ArgumentNullException("'UNITE_DONORS_FEED_HOST' environment variable has to be set");
+                    throw new ArgumentNullException("'UNITE_FEED_DONORS_HOST' environment variable has to be set");
                 else
-                    return $"{PortalHost}/api/donors-feed";
+                    return $"{PortalHost}/api/feed-donors";
             }
                 
 
@@ -38,14 +38,14 @@ public class FeedOptions
     {
         get
         {
-            var value = Environment.GetEnvironmentVariable("UNITE_IMAGES_FEED_HOST");
+            var value = Environment.GetEnvironmentVariable("UNITE_FEED_IMAGES_HOST");
 
             if (string.IsNullOrWhiteSpace(value))
             {
                 if (!MainHostIsSet)
-                    throw new ArgumentNullException("'UNITE_IMAGES_FEED_HOST' environment variable has to be set");
+                    throw new ArgumentNullException("'UNITE_FEED_IMAGES_HOST' environment variable has to be set");
                 else
-                    return $"{PortalHost}/api/images-feed";
+                    return $"{PortalHost}/api/feed-images";
             }
 
             return $"{value}/api";
@@ -56,14 +56,14 @@ public class FeedOptions
     {
         get
         {
-            var value = Environment.GetEnvironmentVariable("UNITE_SPECIMENS_FEED_HOST");
+            var value = Environment.GetEnvironmentVariable("UNITE_FEED_SPECIMENS_HOST");
 
             if (string.IsNullOrWhiteSpace(value))
             {
                 if (!MainHostIsSet)
-                    throw new ArgumentNullException("'UNITE_SPECIMENS_FEED_HOST' environment variable has to be set");
+                    throw new ArgumentNullException("'UNITE_FEED_SPECIMENS_HOST' environment variable has to be set");
                 else
-                    return $"{PortalHost}/api/specimens-feed";
+                    return $"{PortalHost}/api/feed-specimens";
             }
 
             return $"{value}/api";
@@ -74,14 +74,14 @@ public class FeedOptions
     {
         get
         {
-            var value = Environment.GetEnvironmentVariable("UNITE_GENOME_FEED_HOST");
+            var value = Environment.GetEnvironmentVariable("UNITE_FEED_GENOME_HOST");
 
             if (string.IsNullOrWhiteSpace(value))
             {
                 if (!MainHostIsSet)
-                    throw new ArgumentNullException("'UNITE_GENOME_FEED_HOST' environment variable has to be set");
+                    throw new ArgumentNullException("'UNITE_FEED_GENOME_HOST' environment variable has to be set");
                 else
-                    return $"{PortalHost}/api/genome-feed";
+                    return $"{PortalHost}/api/feed-genome";
             }
 
             return $"{value}/api";

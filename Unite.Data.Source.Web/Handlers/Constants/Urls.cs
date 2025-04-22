@@ -14,7 +14,7 @@ public static class Urls
     {
         public static class Entry
         {
-            public const string Mri = $"entries/mri/{_format}"; // MRIs
+            public const string Mr = $"entries/mr/{_format}"; // MRs
             public const string Ct = $"entries/ct/{_format}"; // CTs
         }
 
@@ -40,7 +40,7 @@ public static class Urls
         public static class Dna
         {
             public const string Sample = $"dna/sample/{_format}"; // DNA samples
-            public const string Ssm = $"dna/analysis/ssm/{_format}"; // SSMs
+            public const string Sm = $"dna/analysis/sm/{_format}"; // SMs
             public const string Cnv = $"dna/analysis/cnv/{_format}"; // CNVs
             public const string Sv = $"dna/analysis/sv/{_format}"; // SVs
         }
