@@ -188,16 +188,16 @@ public class ExploringHandler
             DataTypes.Specimen.Entry.Xenograft => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Entry.Xenograft}?review=false",
             DataTypes.Specimen.Intervention => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Intervention}?review=false",
             DataTypes.Specimen.Drug => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Drug}?review=false",
-            DataTypes.Genome.Dna.Sample => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Sample}?review=false",
-            DataTypes.Genome.Dna.Sm => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Sm}?review=false",
-            DataTypes.Genome.Dna.Cnv => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Cnv}?review=false",
-            DataTypes.Genome.Dna.Sv => $"{_feedOptions.GenomeHost}/{Urls.Genome.Dna.Sv}?review=false",
-            DataTypes.Genome.Meth.Sample => $"{_feedOptions.GenomeHost}/{Urls.Genome.Meth.Sample}?review=false",
-            DataTypes.Genome.Meth.Level => $"{_feedOptions.GenomeHost}/{Urls.Genome.Meth.Level}?review=false",
-            DataTypes.Genome.Rna.Sample => $"{_feedOptions.GenomeHost}/{Urls.Genome.Rna.Sample}?review=false",
-            DataTypes.Genome.Rna.Exp => $"{_feedOptions.GenomeHost}/{Urls.Genome.Rna.Exp}?review=false",
-            DataTypes.Genome.Rnasc.Sample => $"{_feedOptions.GenomeHost}/{Urls.Genome.Rnasc.Sample}?review=false",
-            DataTypes.Genome.Rnasc.Exp => $"{_feedOptions.GenomeHost}/{Urls.Genome.Rnasc.Exp}?review=false",
+            DataTypes.Omics.Dna.Sample => $"{_feedOptions.OmicsHost}/{Urls.Omics.Dna.Sample}?review=false",
+            DataTypes.Omics.Dna.Sm => $"{_feedOptions.OmicsHost}/{Urls.Omics.Dna.Sm}?review=false",
+            DataTypes.Omics.Dna.Cnv => $"{_feedOptions.OmicsHost}/{Urls.Omics.Dna.Cnv}?review=false",
+            DataTypes.Omics.Dna.Sv => $"{_feedOptions.OmicsHost}/{Urls.Omics.Dna.Sv}?review=false",
+            DataTypes.Omics.Meth.Sample => $"{_feedOptions.OmicsHost}/{Urls.Omics.Meth.Sample}?review=false",
+            DataTypes.Omics.Meth.Level => $"{_feedOptions.OmicsHost}/{Urls.Omics.Meth.Level}?review=false",
+            DataTypes.Omics.Rna.Sample => $"{_feedOptions.OmicsHost}/{Urls.Omics.Rna.Sample}?review=false",
+            DataTypes.Omics.Rna.Exp => $"{_feedOptions.OmicsHost}/{Urls.Omics.Rna.Exp}?review=false",
+            DataTypes.Omics.Rnasc.Sample => $"{_feedOptions.OmicsHost}/{Urls.Omics.Rnasc.Sample}?review=false",
+            DataTypes.Omics.Rnasc.Exp => $"{_feedOptions.OmicsHost}/{Urls.Omics.Rnasc.Exp}?review=false",
             _ => throw new ArgumentException($"Unknown data type '{type}'")
         };
 
@@ -263,12 +263,12 @@ public class ExploringHandler
     {
         return type switch
         {
-            DataTypes.Genome.Dna.Sample => true,
-            DataTypes.Genome.Meth.Sample => true,
-            DataTypes.Genome.Meth.Level => true,
-            DataTypes.Genome.Rna.Sample => true,
-            DataTypes.Genome.Rnasc.Sample => true,
-            DataTypes.Genome.Rnasc.Exp => true,
+            DataTypes.Omics.Dna.Sample => true,
+            DataTypes.Omics.Meth.Sample => true,
+            DataTypes.Omics.Meth.Level => true,
+            DataTypes.Omics.Rna.Sample => true,
+            DataTypes.Omics.Rnasc.Sample => true,
+            DataTypes.Omics.Rnasc.Exp => true,
             
             _ => false
         };

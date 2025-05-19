@@ -35,7 +35,7 @@ public static class Urls
         public const string Drug = $"analysis/drugs/{_format}"; // Drugs screenings (DSA analysis)
     }
 
-    public static class Genome
+    public static class Omics
     {
         public static class Dna
         {

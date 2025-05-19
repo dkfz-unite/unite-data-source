@@ -55,7 +55,7 @@ public static class DataTypes
         public const string Drug = "spe-drg"; // Drugs screenings (DSA analysis)
     }
 
-    public static class Genome
+    public static class Omics
     {
         public static class Dna
         {

@@ -28,7 +28,7 @@ To configure the application, change environment variables in either docker or [
     This parameter is and optional, if `UNITE_PORTAL_HOST` is set.
 - `UNITE_SPECIMENS_FEED_HOST` - Public url of the specimens feed service (`https://portal.unite.net/api/specimens-feed`).  
     This parameter is and optional, if `UNITE_PORTAL_HOST` is set.
-- `UNITE_GENOME_FEED_HOST` - Public url of the genome feed service (`https://portal.unite.net/api/genome-feed`).  
+- `UNITE_OMICS_FEED_HOST` - Public url of the omics feed service (`https://portal.unite.net/api/omics-feed`).  
     This parameter is and optional, if `UNITE_PORTAL_HOST` is set.
 - `UNITE_CONFIG_PATH` - Path to the configuration folder (`./config`).
 - `UNITE_CACHE_PATH` - Path to the cache folder (`./cache`).

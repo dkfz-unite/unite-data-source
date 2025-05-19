@@ -70,18 +70,18 @@ public class FeedOptions
         }
     }
 
-    public string GenomeHost
+    public string OmicsHost
     {
         get
         {
-            var value = Environment.GetEnvironmentVariable("UNITE_FEED_GENOME_HOST");
+            var value = Environment.GetEnvironmentVariable("UNITE_FEED_OMICS_HOST");
 
             if (string.IsNullOrWhiteSpace(value))
             {
                 if (!MainHostIsSet)
-                    throw new ArgumentNullException("'UNITE_FEED_GENOME_HOST' environment variable has to be set");
+                    throw new ArgumentNullException("'UNITE_FEED_OMICS_HOST' environment variable has to be set");
                 else
-                    return $"{PortalHost}/api/feed-genome";
+                    return $"{PortalHost}/api/feed-omics";
             }
 
             return $"{value}/api";
@@ -104,7 +104,7 @@ public class FeedOptions
             return !string.IsNullOrWhiteSpace(DonorsHost) &&
                    !string.IsNullOrWhiteSpace(ImagesHost) &&
                    !string.IsNullOrWhiteSpace(SpecimensHost) &&
-                   !string.IsNullOrWhiteSpace(GenomeHost);
+                   !string.IsNullOrWhiteSpace(OmicsHost);
         }
     }
 }
