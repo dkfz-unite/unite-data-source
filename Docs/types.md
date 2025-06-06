@@ -15,14 +15,14 @@ Data types are the types of data UNITE can work with.
     - [spe-int](https://github.com/dkfz-unite/unite-specimens-feed/blob/main/Docs/api-models-interventions.md) - specimens interventions data.
     - [spe-drg](https://github.com/dkfz-unite/unite-specimens-feed/blob/main/Docs/api-models-drugs.md) - specimen drugs screening data.
 - Genomic
-    - [dna](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-sample.md) - DNA sample data.
-    - [dna-sm](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-dna-sm.md) - DNA Simple Mutations data.
-    - [dna-cnv](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-dna-cnv.md) - DNA Copy Number Variants data.
-    - [dna-sv](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-dna-sv.md) - DNA Structural Variants data.
-    - [rna](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-sample.md) - **bulk** RNA sample data.
-    - [rna-exp](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-rna-exp.md) - **bulk** RNA expressions data.
-    - [rnasc](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-sample.md) - **single cell** RNA sample data.
-    - [rnasc-exp](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-rnasc-exp.md) - **single cell** RNA expressions data.
+    - [dna](https://github.com/dkfz-unite/unite-omics-feed/blob/main/Docs/api-models-sample.md) - DNA sample data.
+    - [dna-sm](https://github.com/dkfz-unite/unite-omics-feed/blob/main/Docs/api-models-dna-sm.md) - DNA Simple Mutations data.
+    - [dna-cnv](https://github.com/dkfz-unite/unite-omics-feed/blob/main/Docs/api-models-dna-cnv.md) - DNA Copy Number Variants data.
+    - [dna-sv](https://github.com/dkfz-unite/unite-omics-feed/blob/main/Docs/api-models-dna-sv.md) - DNA Structural Variants data.
+    - [rna](https://github.com/dkfz-unite/unite-omics-feed/blob/main/Docs/api-models-sample.md) - **bulk** RNA sample data.
+    - [rna-exp](https://github.com/dkfz-unite/unite-omics-feed/blob/main/Docs/api-models-rna-exp.md) - **bulk** RNA expressions data.
+    - [rnasc](https://github.com/dkfz-unite/unite-omics-feed/blob/main/Docs/api-models-sample.md) - **single cell** RNA sample data.
+    - [rnasc-exp](https://github.com/dkfz-unite/unite-omics-feed/blob/main/Docs/api-models-rnasc-exp.md) - **single cell** RNA expressions data.
 
 ## Resources
 Resource is a file, which has to be hosted on the server and can be later accessed by the url.  
