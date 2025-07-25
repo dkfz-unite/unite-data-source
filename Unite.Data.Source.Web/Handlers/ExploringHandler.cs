@@ -1,8 +1,8 @@
-using System.Diagnostics;
 using System.Text;
 using Unite.Data.Source.Web.Configuration.Options;
 using Unite.Data.Source.Web.Handlers.Constants;
 using Unite.Data.Source.Web.Handlers.Contract;
+using Unite.Data.Source.Web.Handlers.Contract.Extensions;
 using Unite.Essentials.Tsv;
 
 namespace Unite.Data.Source.Web.Handlers;
@@ -51,31 +51,27 @@ public class ExploringHandler
 
         foreach (var folderConfig in folderConfigs)
         {
-            // _logger.LogInformation("Exploring folder '{path}'", folderConfig.Path);
-
             foreach (var type in folderConfig.Types)
-            {
+            {                
+                var sheetPath = Path.Combine(_configOptions.DataPath, folderConfig.Path, $"{type}.tsv");
+                var sheetExists = File.Exists(sheetPath);
+
                 var crawlerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "crawler");
                 var crawlerExists = File.Exists(crawlerPath);
 
-                var sheetFilePath = Path.Combine(_configOptions.DataPath, folderConfig.Path, $"{type}.tsv");
-                var sheetExists = File.Exists(sheetFilePath);
-
-                if (!crawlerExists && !sheetExists)
+                if (!sheetExists && !sheetExists)
                 {
-                    _logger.LogWarning("Neither crawler '{crawler}' nor sheet file '{sheet}' exists for type '{type}' in folder '{path}'",
-                        crawlerPath, sheetFilePath, type, folderConfig.Path);
-
+                    _logger.LogWarning("Neither crawler nor sheet file exists for type '{type}'", type);
                     continue;
                 }
 
-                var tsv = sheetExists ? await File.ReadAllTextAsync(sheetFilePath) : await ReadContent(crawlerPath, type, folderConfig.Path);
-
+                var tsv = sheetExists
+                    ? await File.ReadAllTextAsync(sheetPath)
+                    : await Command.Run(crawlerPath, type, folderConfig.Path);
+               
                 if (string.IsNullOrWhiteSpace(tsv))
                 {
-                    _logger.LogWarning("Sheet content is empty for type '{type}' in folder '{path}'",
-                        type, folderConfig.Path);
-
+                    _logger.LogWarning("Sheet content is empty for type '{type}'", type);
                     continue;
                 }
 
@@ -85,86 +81,79 @@ public class ExploringHandler
 
                     foreach (var file in files)
                     {
-                        var path = Path.Combine(folderConfig.Path, file.Path);
+                        var pathRelative = Path.Combine(folderConfig.Path, file.Path);
+                        var pathAbsolute = Path.Combine(_configOptions.DataPath, pathRelative);
 
-                        if (_foundFilesCache.Contains(path) || _errorFilesCache.Contains(path))
+                        if (_foundFilesCache.Contains(pathRelative) || _errorFilesCache.Contains(pathRelative))
                             continue;
 
-                        if (file.Reader.StartsWith("cmd/")) // File has custom reader
+                        if (string.IsNullOrWhiteSpace(file.Reader)) // File is a resource
                         {
-                            var readerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "readers", file.Reader[4..]);
-
-                            var content = await ReadContent(readerPath, file.Path);
-                            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-
-                            var form = file.AsForm();
-                            form.Add(new StreamContent(stream), "entries", "entries.tsv");
+                            var key = Guid.NewGuid().ToString();
+                            var url = $"{_workerOptions.Host}/api/file/{key}";
+                            var resource = file.AsResource(type, url);
 
                             try
                             {
-                                UploadResult(type, form, file.Reader);
+                                var content = TsvWriter.Write([resource]);
+                                using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+                                var form = file.AsForm().AddField(ResultFile.ResourcesColumn, "resources.tsv", stream);
 
-                                _foundFilesCache.Add(path);
+                                await UploadResult(type, form, null);
+
+                                _hostFilesCache.Add(key, pathRelative);
+                                _foundFilesCache.Add(pathRelative);
+                                _logger.LogInformation("Uploaded and hosted file '{key}' '{path}'", key, pathRelative);
                             }
                             catch (Exception ex)
                             {
-                                _errorFilesCache.Add(path);
-                                _logger.LogError("Failed to upload file '{path}'", path);
-                                _logger.LogError("{message}", ex.Message);
+                                _errorFilesCache.Add(pathRelative);
+                                _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
 
                                 continue;
                             }
                         }
-                        else
+                        else if (file.Reader.StartsWith("cmd/")) // File has custom reader
                         {
-                            if (IsResourceType(type)) // File is a resource
-                            {
-                                var key = Guid.NewGuid().ToString();
-                                var url = $"{_workerOptions.Host}/api/file/{key}";
-                                var resource = file.AsResource(type, url);
+                            var readerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "readers", file.Reader[4..]);
 
-                                var content = TsvWriter.Write([resource]);
+                            try
+                            {
+                                var content = await Command.Run(readerPath, pathAbsolute);
                                 using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+                                var form = file.AsForm().AddField(ResultFile.EntriesColumn, "entries.tsv", stream);
 
-                                var form = file.AsForm();
-                                form.Add(new StreamContent(stream), "resources", "resources.tsv");
+                                await UploadResult(type, form, file.Reader);
 
-                                try
-                                {
-                                    UploadSample(type, form);
-
-                                    _hostFilesCache.Add(key, path);
-                                    _foundFilesCache.Add(path);
-                                }
-                                catch (Exception ex)
-                                {
-                                    _errorFilesCache.Add(path);
-                                    _logger.LogError("Failed to upload file '{path}'", path);
-                                    _logger.LogError("{message}", ex.Message);
-
-                                    continue;
-                                }
+                                _foundFilesCache.Add(pathRelative);
+                                _logger.LogInformation("Uploaded file '{path}'", pathRelative);
                             }
-                            else // File has standard reader
+                            catch (Exception ex)
                             {
-                                var form = file.AsForm();
-                                using var stream = File.OpenRead(file.Path);
-                                form.Add(new StreamContent(stream), "entries", "entries.tsv");
+                                _errorFilesCache.Add(pathRelative);
+                                _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
 
-                                try
-                                {
-                                    UploadResult(type, form, file.Reader);
+                                continue;
+                            }
+                        }
+                        else // File has standard reader
+                        {
+                            try
+                            {
+                                using var stream = File.OpenRead(pathAbsolute);
+                                var form = file.AsForm().AddField(ResultFile.EntriesColumn, "entries.tsv", stream);
 
-                                    _foundFilesCache.Add(path);
-                                }
-                                catch (Exception ex)
-                                {
-                                    _errorFilesCache.Add(path);
-                                    _logger.LogError("Failed to upload file '{path}'", path);
-                                    _logger.LogError("{message}", ex.Message);
+                                await UploadResult(type, form, file.Reader);
 
-                                    continue;
-                                }
+                                _foundFilesCache.Add(pathRelative);
+                                _logger.LogInformation("Uploaded file '{path}'", pathRelative);
+                            }
+                            catch (Exception ex)
+                            {
+                                _errorFilesCache.Add(pathRelative);
+                                _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
+
+                                continue;
                             }
                         }
                     }
@@ -175,144 +164,32 @@ public class ExploringHandler
 
                     foreach (var file in files)
                     {
-                        var path = Path.Combine(folderConfig.Path, file.Path);
+                        var pathRelative = Path.Combine(folderConfig.Path, file.Path);
+                        var pathAbsolute = Path.Combine(_configOptions.DataPath, pathRelative);
 
-                        if (_foundFilesCache.Contains(path) || _errorFilesCache.Contains(path))
+                        if (_foundFilesCache.Contains(pathRelative) || _errorFilesCache.Contains(pathRelative))
                             continue;
 
                         var key = Guid.NewGuid().ToString();
                         var url = $"{_workerOptions.Host}/api/file/{key}";
                         var resource = file.AsResource(type, url);
 
-                        var content = TsvWriter.Write([resource]);
-                        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-
-                        var form = file.AsForm();
-                        form.Add(new StreamContent(stream), "resources", "resources.tsv");
-
                         try
                         {
-                            UploadSample(type, form);
+                            var content = TsvWriter.Write([resource]);
+                            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+                            var form = file.AsForm().AddField(SampleFile.ResourcesColumn, "resources.tsv", stream);
 
-                            _hostFilesCache.Add(key, path);
-                            _foundFilesCache.Add(path);
+                            await UploadSample(type, form);
+
+                            _hostFilesCache.Add(key, pathRelative);
+                            _foundFilesCache.Add(pathRelative);
+                            _logger.LogInformation("Uploaded and hosted file '{key}' '{path}'", key, pathRelative);
                         }
                         catch (Exception ex)
                         {
-                            _errorFilesCache.Add(path);
-                            _logger.LogError("Failed to upload file '{path}'", path);
-                            _logger.LogError("{message}", ex.Message);
-                        }
-                    }
-                }
-
-                continue;
-
-
-                // var crawlerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "crawler");
-
-                if (!File.Exists(crawlerPath))
-                {
-                    _logger.LogWarning("Crawler '{path}' not found", crawlerPath);
-
-                    continue;
-                }
-
-                var crawlerProcess = PrepareProcess(crawlerPath, type, Path.Combine(_configOptions.DataPath, folderConfig.Path));
-
-                var crawlerOutput = await RunProcess(crawlerProcess);
-
-                var filesMetadata = TsvReader.Read<FileMetadata>(crawlerOutput).ToArray();
-
-                // _logger.LogInformation("Found {count} files of type '{type}'", filesMetadata.Length, type);
-
-                foreach (var fileMetadata in filesMetadata)
-                {
-                    var path = GetPath(_configOptions.DataPath, fileMetadata.Path);
-
-                    var content = string.Empty;
-
-                    if (_foundFilesCache.Contains(path) || _errorFilesCache.Contains(path))
-                    {
-                        continue;
-                    }
-
-                    _logger.LogInformation("New '{type}' file '.../{path}'", type, path);
-
-                    if (fileMetadata.Reader.StartsWith("cmd/"))
-                    {
-                        var readerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "readers", fileMetadata.Reader[4..]);
-
-                        if (!File.Exists(readerPath))
-                        {
-                            _errorFilesCache.Add(path);
-                            _logger.LogWarning("Reader '{path}' not found", readerPath);
-
-                            continue;
-                        }
-
-                        var readerProcess = PrepareProcess(readerPath, $"\"{fileMetadata.Path}\"");
-
-                        content += await RunProcess(readerProcess);
-
-                        if (string.IsNullOrWhiteSpace(content))
-                        {
-                            _errorFilesCache.Add(path);
-                            _logger.LogError("Failed to read file '{path}'", path);
-
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        content += await File.ReadAllTextAsync(fileMetadata.Path);
-
-                        if (string.IsNullOrWhiteSpace(content))
-                        {
-                            _errorFilesCache.Add(path);
-                            _logger.LogError("Failed to read file '{path}'", path);
-
-                            continue;
-                        }
-                    }
-
-                    if (IsResourceType(type))
-                    {
-                        var key = Guid.NewGuid().ToString();
-
-                        var url = $"{_workerOptions.Host}/api/file/{key}";
-
-                        var resource = new Resource(fileMetadata.Name, type, fileMetadata.Format, fileMetadata.Archive, url);
-
-                        content = Merge(content, TsvWriter.Write([resource]));
-
-                        try
-                        {
-                            UploadFileContent(type, content);
-
-                            _hostFilesCache.Add(key, path);
-                            _foundFilesCache.Add(path);
-                        }
-                        catch (Exception ex)
-                        {
-                            _errorFilesCache.Add(path);
-                            _logger.LogError(ex, "Failed to upload and host file '{path}'", path);
-                            _logger.LogError("{content}", content);
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            UploadFileContent(type, content);
-
-                            _foundFilesCache.Add(path);
-                        }
-                        catch (Exception ex)
-                        {
-                            _errorFilesCache.Add(path);
-                            _logger.LogError(ex, "Failed to upload file '{path}'", path);
-                            _logger.LogError("{content}", content);
+                            _errorFilesCache.Add(pathRelative);
+                            _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
                         }
                     }
                 }
@@ -322,49 +199,43 @@ public class ExploringHandler
         await Task.CompletedTask;
     }
 
-    private void UploadSample(string type, MultipartFormDataContent form)
+    private async Task UploadSample(string type, MultipartFormDataContent form, bool review = true)
     {
         using var handler = new HttpClientHandler { UseProxy = false };
         using var client = new HttpClient(handler);
 
         var url = type switch
         {
-            DataTypes.Omics.Dna.Sample => $"{_feedOptions.OmicsHost}/{UrlsFile.Omics.Dna.Sample}?review=false",
-            DataTypes.Omics.Meth.Sample => $"{_feedOptions.OmicsHost}/{UrlsFile.Omics.Meth.Sample}?review=false",
-            DataTypes.Omics.Rna.Sample => $"{_feedOptions.OmicsHost}/{UrlsFile.Omics.Rna.Sample}?review=false",
-            DataTypes.Omics.Rnasc.Sample => $"{_feedOptions.OmicsHost}/{UrlsFile.Omics.Rnasc.Sample}?review=false",
+            DataTypes.Omics.Dna.Sample => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Dna.Sample}?review={review}",
+            DataTypes.Omics.Meth.Sample => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Meth.Sample}?review={review}",
+            DataTypes.Omics.Rna.Sample => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Rna.Sample}?review={review}",
+            DataTypes.Omics.Rnasc.Sample => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Rnasc.Sample}?review={review}",
             _ => throw new ArgumentException($"Unknown data type '{type}'")
         };
 
         var request = new HttpRequestMessage(HttpMethod.Post, url);
-
         request.Headers.Add("Authorization", $"Bearer {_workerOptions.Token}");
-
         request.Content = form;
 
-        var result = client.SendAsync(request).Result;
+        var result = await client.SendAsync(request);
 
         if (!result.IsSuccessStatusCode)
-        {
-            var error = $"Uploading to '{url}' resulted in '{result.StatusCode}'\n{result.Content.ReadAsStringAsync().Result}";
-
-            throw new Exception(error);
-        }
+            throw new Exception($"Uploading to '{url}' resulted in '{result.StatusCode}'\n{result.Content.ReadAsStringAsync().Result}");
     }
 
-    public void UploadResult(string type, MultipartFormDataContent form, string format)
+    public async Task UploadResult(string type, MultipartFormDataContent form, string format, bool review = true)
     {
         using var handler = new HttpClientHandler { UseProxy = false };
         using var client = new HttpClient(handler);
 
         var url = type switch
         {
-            DataTypes.Omics.Dna.Sm => $"{_feedOptions.OmicsHost}/{UrlsFile.Omics.Dna.Sm}?review=false",
-            DataTypes.Omics.Dna.Cnv => $"{_feedOptions.OmicsHost}/{UrlsFile.Omics.Dna.Cnv}?review=false",
-            DataTypes.Omics.Dna.Sv => $"{_feedOptions.OmicsHost}/{UrlsFile.Omics.Dna.Sv}?review=false",
-            DataTypes.Omics.Meth.Level => $"{_feedOptions.OmicsHost}/{UrlsFile.Omics.Meth.Level}?review=false",
-            DataTypes.Omics.Rna.Exp => $"{_feedOptions.OmicsHost}/{UrlsFile.Omics.Rna.Exp}?review=false",
-            DataTypes.Omics.Rnasc.Exp => $"{_feedOptions.OmicsHost}/{UrlsFile.Omics.Rnasc.Exp}?review=false",
+            DataTypes.Omics.Dna.Sm => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Dna.Sm}?review={review}",
+            DataTypes.Omics.Dna.Cnv => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Dna.Cnv}?review={review}",
+            DataTypes.Omics.Dna.Sv => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Dna.Sv}?review={review}",
+            DataTypes.Omics.Meth.Level => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Meth.Level}?review={review}",
+            DataTypes.Omics.Rna.Exp => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Rna.Exp}?review={review}",
+            DataTypes.Omics.Rnasc.Exp => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Rnasc.Exp}?review={review}",
             _ => throw new ArgumentException($"Unknown data type '{type}'")
         };
 
@@ -372,119 +243,20 @@ public class ExploringHandler
             url += $"&format={format}";
 
         var request = new HttpRequestMessage(HttpMethod.Post, url);
-
         request.Headers.Add("Authorization", $"Bearer {_workerOptions.Token}");
-
         request.Content = form;
 
-        var result = client.SendAsync(request).Result;
-
-        if (!result.IsSuccessStatusCode)
+        try
         {
-            var error = $"Uploading to '{url}' resulted in '{result.StatusCode}'\n{result.Content.ReadAsStringAsync().Result}";
+            var result = await client.SendAsync(request);
 
-            throw new Exception(error);
+            if (!result.IsSuccessStatusCode)
+            throw new Exception($"Uploading to '{url}' resulted in '{result.StatusCode}'\n{result.Content.ReadAsStringAsync().Result}");
         }
-    }
-
-    private void UploadFileContent(string type, string content)
-    {
-        var handler = new HttpClientHandler
+        catch (Exception ex)
         {
-            UseProxy = false
-        };
-
-        using var client = new HttpClient(handler);
-
-        var url = type switch
-        {
-            DataTypes.Donor.Entry => $"{_feedOptions.DonorsHost}/{Urls.Donor.Entry}?review=false",
-            DataTypes.Donor.Treatment => $"{_feedOptions.DonorsHost}/{Urls.Donor.Treatment}?review=false",
-            DataTypes.Image.Entry.Mr => $"{_feedOptions.ImagesHost}/{Urls.Image.Entry.Mr}?review=false",
-            DataTypes.Image.Entry.Ct => $"{_feedOptions.ImagesHost}/{Urls.Image.Entry.Ct}?review=false",
-            DataTypes.Image.Feature => $"{_feedOptions.ImagesHost}/{Urls.Image.Feature}?review=false",
-            DataTypes.Specimen.Entry.Material => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Entry.Material}?review=false",
-            DataTypes.Specimen.Entry.Line => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Entry.Line}?review=false",
-            DataTypes.Specimen.Entry.Organoid => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Entry.Organoid}?review=false",
-            DataTypes.Specimen.Entry.Xenograft => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Entry.Xenograft}?review=false",
-            DataTypes.Specimen.Intervention => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Intervention}?review=false",
-            DataTypes.Specimen.Drug => $"{_feedOptions.SpecimensHost}/{Urls.Specimen.Drug}?review=false",
-            DataTypes.Omics.Dna.Sample => $"{_feedOptions.OmicsHost}/{Urls.Omics.Dna.Sample}?review=false",
-            DataTypes.Omics.Dna.Sm => $"{_feedOptions.OmicsHost}/{Urls.Omics.Dna.Sm}?review=false",
-            DataTypes.Omics.Dna.Cnv => $"{_feedOptions.OmicsHost}/{Urls.Omics.Dna.Cnv}?review=false",
-            DataTypes.Omics.Dna.Sv => $"{_feedOptions.OmicsHost}/{Urls.Omics.Dna.Sv}?review=false",
-            DataTypes.Omics.Meth.Sample => $"{_feedOptions.OmicsHost}/{Urls.Omics.Meth.Sample}?review=false",
-            DataTypes.Omics.Meth.Level => $"{_feedOptions.OmicsHost}/{Urls.Omics.Meth.Level}?review=false",
-            DataTypes.Omics.Rna.Sample => $"{_feedOptions.OmicsHost}/{Urls.Omics.Rna.Sample}?review=false",
-            DataTypes.Omics.Rna.Exp => $"{_feedOptions.OmicsHost}/{Urls.Omics.Rna.Exp}?review=false",
-            DataTypes.Omics.Rnasc.Sample => $"{_feedOptions.OmicsHost}/{Urls.Omics.Rnasc.Sample}?review=false",
-            DataTypes.Omics.Rnasc.Exp => $"{_feedOptions.OmicsHost}/{Urls.Omics.Rnasc.Exp}?review=false",
-            _ => throw new ArgumentException($"Unknown data type '{type}'")
-        };
-
-        var request = new HttpRequestMessage(HttpMethod.Post, url);
-
-        request.Headers.Add("Authorization", $"Bearer {_workerOptions.Token}");
-
-        request.Content = new StringContent(content, Encoding.UTF8, "text/tab-separated-values");
-
-        var result = client.SendAsync(request).Result;
-
-        if (!result.IsSuccessStatusCode)
-        {
-            var error = $"Uploading to '{url}' resulted in '{result.StatusCode}'\n{result.Content.ReadAsStringAsync().Result}";
-
-            throw new Exception(error);
+            throw new Exception($"Failed to send request to '{url}'\n{ex.Message}");
         }
-    }
-
-    private static Process PrepareProcess(string path, params string[] arguments)
-    {
-        var process = new Process();
-
-        process.StartInfo.WorkingDirectory = Path.GetDirectoryName(path);
-        process.StartInfo.FileName = Path.GetFullPath(path);
-        process.StartInfo.Arguments = string.Join(" ", arguments);
-        process.StartInfo.UseShellExecute = false;
-        process.StartInfo.RedirectStandardInput = true;
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-        process.StartInfo.CreateNoWindow = true;
-
-        return process;
-    }
-
-    private static async Task<string> RunProcess(Process process)
-    {
-        process.Start();
-
-        var output = await process.StandardOutput.ReadToEndAsync();
-        var error = await process.StandardError.ReadToEndAsync();
-
-        await process.WaitForExitAsync();
-
-        if (process.ExitCode > 0)
-            throw new Exception(error);
-
-        if (error.Length > 0)
-            Console.Error.WriteLine(error);
-            
-        return output;
-    }
-
-    private static async Task<string> ReadContent(string path, params string[] arguments)
-    {
-        if (!File.Exists(path))
-            throw new FileNotFoundException($"Process file '{path}' not found.");
-
-        var process = PrepareProcess(path, arguments);
-
-        var content = await RunProcess(process);
-
-        if (string.IsNullOrWhiteSpace(content))
-            throw new Exception($"Process '{path}' returned empty content.");
-
-        return content;
     }
 
     private static string GetPath(string dataPath, string filePath)
@@ -493,28 +265,5 @@ public class ExploringHandler
             return filePath;
 
         return filePath[dataPath.Length..];
-    }
-
-    private static bool IsResourceType(string type)
-    {
-        return type switch
-        {
-            DataTypes.Omics.Dna.Sample => true,
-            DataTypes.Omics.Meth.Sample => true,
-            DataTypes.Omics.Meth.Level => true,
-            DataTypes.Omics.Rna.Sample => true,
-            DataTypes.Omics.Rnasc.Sample => true,
-            DataTypes.Omics.Rnasc.Exp => true,
-            
-            _ => false
-        };
-    }
-
-    private static string Merge(string metadata, string data)
-    {
-        if (metadata.EndsWith(Environment.NewLine))
-            return metadata + data;
-        else
-            return metadata + Environment.NewLine + data;
     }
 }

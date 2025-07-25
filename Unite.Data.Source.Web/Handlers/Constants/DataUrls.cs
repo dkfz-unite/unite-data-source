@@ -1,6 +1,6 @@
 namespace Unite.Data.Source.Web.Handlers.Constants;
 
-public static class UrlsFile
+public static class DataUrls
 {
     private const string _format = "file";
 

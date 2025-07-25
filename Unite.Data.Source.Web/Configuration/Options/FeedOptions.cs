@@ -11,7 +11,7 @@ public class FeedOptions
             if (string.IsNullOrWhiteSpace(value) && !CustomHostsAreSet)
                 throw new ArgumentNullException($"'UNITE_PORTAL_HOST' environment variable has to be set");
 
-            return value;
+            return AppendScheme(value);
         }
     }
 
@@ -28,9 +28,9 @@ public class FeedOptions
                 else
                     return $"{PortalHost}/api/feed-donors";
             }
-                
 
-            return $"{value}/api";
+
+            return AppendScheme($"{value}/api");
         }
     }
 
@@ -48,7 +48,7 @@ public class FeedOptions
                     return $"{PortalHost}/api/feed-images";
             }
 
-            return $"{value}/api";
+            return AppendScheme($"{value}/api");
         }
     }
 
@@ -66,7 +66,7 @@ public class FeedOptions
                     return $"{PortalHost}/api/feed-specimens";
             }
 
-            return $"{value}/api";
+            return AppendScheme($"{value}/api");
         }
     }
 
@@ -84,7 +84,7 @@ public class FeedOptions
                     return $"{PortalHost}/api/feed-omics";
             }
 
-            return $"{value}/api";
+            return AppendScheme($"{value}/api");
         }
     }
 
@@ -106,5 +106,13 @@ public class FeedOptions
                    !string.IsNullOrWhiteSpace(SpecimensHost) &&
                    !string.IsNullOrWhiteSpace(OmicsHost);
         }
+    }
+
+    private string AppendScheme(string url)
+    {
+        if (url.StartsWith("http://") || url.StartsWith("https://"))
+            return url;
+        else
+            return $"http://{url}";
     }
 }

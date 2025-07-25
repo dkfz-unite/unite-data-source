@@ -1,11 +1,9 @@
-using Unite.Data.Source.Web.Handlers.Contract.Enums;
 using Unite.Data.Source.Web.Handlers.Contract.Extensions;
-using Unite.Essentials.Extensions;
 using Unite.Essentials.Tsv.Attributes;
 
 namespace Unite.Data.Source.Web.Handlers.Contract;
 
-public class ResultFile
+public record ResultFile
 {
     public const string DonorIdColumn = "donor_id";
     public const string SpecimenIdColumn = "specimen_id";
@@ -18,8 +16,11 @@ public class ResultFile
     public const string PurityColumn = "purity";
     public const string PloidyColumn = "ploidy";
     public const string GenomeColumn = "genome";
+    public const string FormatColumn = "format";
     public const string ReaderColumn = "reader";
     public const string PathColumn = "path";
+    public const string ResourcesColumn = "resources";
+    public const string EntriesColumn = "entries";
 
 
     [Column(DonorIdColumn)]
@@ -29,31 +30,34 @@ public class ResultFile
     public string SpecimenId { get; set; }
 
     [Column(SpecimenTypeColumn)]
-    public SpecimenType SpecimenType { get; set; }
+    public string SpecimenType { get; set; }
 
     [Column(MatchedSpecimenIdColumn)]
     public string MatchedSpecimenId { get; set; }
 
     [Column(MatchedSpecimenTypeColumn)]
-    public SpecimenType? MatchedSpecimenType { get; set; }
+    public string MatchedSpecimenType { get; set; }
 
     [Column(AnalysisTypeColumn)]
-    public AnalysisType AnalysisType { get; set; }
+    public string AnalysisType { get; set; }
 
     [Column(AnalysisDateColumn)]
-    public DateOnly? AnalysisDate { get; set; }
+    public string AnalysisDate { get; set; }
 
     [Column(AnalysisDayColumn)]
-    public int? AnalysisDay { get; set; }
+    public string AnalysisDay { get; set; }
 
     [Column(PurityColumn)]
-    public double? Purity { get; set; }
+    public string Purity { get; set; }
 
     [Column(PloidyColumn)]
-    public double? Ploidy { get; set; }
+    public string Ploidy { get; set; }
 
     [Column(GenomeColumn)]
     public string Genome { get; set; }
+
+    [Column(FormatColumn)]
+    public string Format { get; set; }
 
     [Column(ReaderColumn)]
     public string Reader { get; set; }
@@ -67,10 +71,10 @@ public class ResultFile
         return new MultipartFormDataContent()
             .AddField(DonorIdColumn, DonorId)
             .AddField(SpecimenIdColumn, SpecimenId)
-            .AddField(SpecimenTypeColumn, SpecimenType.ToDefinitionString())
+            .AddField(SpecimenTypeColumn, SpecimenType)
             .AddField(MatchedSpecimenIdColumn, MatchedSpecimenId)
-            .AddField(MatchedSpecimenTypeColumn, MatchedSpecimenType?.ToDefinitionString())
-            .AddField(AnalysisTypeColumn, AnalysisType.ToDefinitionString())
+            .AddField(MatchedSpecimenTypeColumn, MatchedSpecimenType)
+            .AddField(AnalysisTypeColumn, AnalysisType)
             .AddField(AnalysisDateColumn, AnalysisDate)
             .AddField(AnalysisDayColumn, AnalysisDay)
             .AddField(PurityColumn, Purity)
@@ -82,6 +86,6 @@ public class ResultFile
     {
         var name = System.IO.Path.GetFileName(Path);
 
-        return new Resource(name, type, Reader, null, url);
+        return new Resource(name, type, Format, null, url);
     }
 }

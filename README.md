@@ -2,14 +2,16 @@
 
 ## General
 Data source service provides the following functionality:
-- Uses custom [crawlers](./Docs/crawler.md) to find required files.
-- Uses custom [readers](./Docs/reader.md) to read the files.
-- Hosts required files, and provides protected [web API](./Docs/api.md) to access them by a url.
+- Scans configured folders in the file system for the files with data of different types.
+    - Uses sample sheets with required metadata and location of the files (if available).
+    - Can use custom [crawler](./Docs/crawler.md) applications to locate the files (with required metadata) in configured folders.
+    - Can use custom [reader](./Docs/reader.md) applications to convert the files to the format required by the UNITE portal.
+- Hosts required files, and provides protected [web API](./Docs/api.md) to access them remotely.
 
 ## Access
 Environment|Address|Port
 -----------|-------|----
-Host|http://localhost:5300|5300
+Host|http://localhost:5400|5400
 
 ## Configuration
 
@@ -35,6 +37,32 @@ To configure the application, change environment variables in either docker or [
 - `UNITE_DATA_PATH` - Path to the data folder (`/data`).  
     Allows to set custom root files path.
 
+### Folders Configuration
+To configure the service, to explore required data, create a configuration file `config.tsv` in the configuration folder (`UNITE_CONFIG_PATH`) with the following structure:
+```tsv
+path    types   crawler
+relative/path/to/folder dna, dna-sm, dna-cnv, dna-sv, meth, rna, rna-exp, rnasc, rnasc-exp  default
+```
+
+Where:
+- `path` - Relative (if `UNITE_DATA_PATH` is set) or absolute path to the folder where the service should look for the files.
+- `types` - Comma separated list of the [data types](./Docs/types.md), files of which the service should look for in configured folder.
+- `crawler` - Name of the crawler directory with custom crawler and readers.
+    
+
+#### Workflow
+The workflow of the service is following:
+
+- The service reads the `config.tsv` file line by line and for each data type from the `types` list of the line
+    - Service is looking for corresponding samples sheet file with name `<type>.tsv` in the configured `path` folder.
+        - If the file **exists**, the service will use it.
+        - If the file **does not exist**, the service will try to use custom crawler in the configured `crawler` folder.  
+          It will expect the application with the name **'crawler'** in the configured `crawler` folder.
+    - For each file either from the samples sheet or found by the crawler:
+        - If the file is a resource (`fasta`, `bam`, `idat`, etc.) the service will **host** it and send **only it's metadata** to Portal.
+        - If the file is a data file (`snv.vcf`, `indel.vcf`, `cnv.tsv`, etc.), the service will send it to the Portal for further processing and integration.
+            - If the format of the file is not supported by the Portal, the service will try to use a custom reader from the file metadata.
+        
 ### Crawlers
 Data crawlers(explorers) are **custom** applications used to find required files in desired folders.  
 Please, read [crawlers](./Docs/crawler.md) documentation to understand how to create and configure them.
