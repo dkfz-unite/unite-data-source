@@ -50,121 +50,158 @@ Where:
 - `crawler` - Name of the crawler directory with custom crawler and readers.
     
 
-#### Workflow
+### Workflow
 The workflow of the service is following:
 
-- The service reads the `config.tsv` file line by line and for each data type from the `types` list of the line
+- The service reads the `config.tsv` file line by line and for each data [type](./Docs/types.md) from the `types` list of the line
     - Service is looking for corresponding samples sheet file with name `<type>.tsv` in the configured `path` folder.
         - If the file **exists**, the service will use it.
         - If the file **does not exist**, the service will try to use custom crawler in the configured `crawler` folder.  
           It will expect the application with the name **'crawler'** in the configured `crawler` folder.
     - For each file either from the samples sheet or found by the crawler:
-        - If the file is a resource (`fasta`, `bam`, `idat`, etc.) the service will **host** it and send **only it's metadata** to Portal.
+        - If the file is a resource (`fasta`, `bam`, `idat`, etc.) the service will **host** it and send **only it's metadata** to the Portal.
         - If the file is a data file (`snv.vcf`, `indel.vcf`, `cnv.tsv`, etc.), the service will send it to the Portal for further processing and integration.
-            - If the format of the file is not supported by the Portal, the service will try to use a custom reader from the file metadata.
+            - If the format of the file is not supported by the Portal, the service will try to use a custom reader from the file metadata.  
+              In this case it will expect the application with the corresponding name in the configured `crawler/readers` folder.
         
-### Crawlers
-Data crawlers(explorers) are **custom** applications used to find required files in desired folders.  
-Please, read [crawlers](./Docs/crawler.md) documentation to understand how to create and configure them.
+### Custom Crawlers
+Crawler is a custom command line application which locates files of given [type](./Docs/types.md) in given location and returns their metadata and locations as a sample sheet.
 
-To configure the crawlers, create a configuration file `config.tsv` in the configuration folder ('UNITE_CONFIG_PATH') with the following structure:
+#### Input
+The application should accept the following arguments as an input:
+1. `<type>` as a first argument - [data type](./Docs/types.md) to look for.
+2. `<path>` as a second argument - Absolute path to the folder where the crawler should look for files.
+
+#### Output
+The application should output the sample sheet in the format corresponding to the `<type>` argument passed to the crawler application.
+
+For example, if the `<type>` is `dna-sm`, the output should be a sample sheet in [corresponding](./Docs/types.md#simple-mutations) format:
 ```tsv
-folder  crawler types
-my/folder   my-crawler  dna, dna-sm, dna-cnv, dna-sv
+donor_id	specimen_id	specimen_type	matched_specimen_id	matched_specimen_type    analysis_type	analysis_date	genome	reader	path
+Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    tsv    omics/WGS/Donor1/snv.tsv
+Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    tsv    omics/WGS/Donor1/indel.tsv
+Donor2    Tumor    Material    Normal    Material    WGS    2023-01-02    GRCh37    vcf    omics/WGS/Donor2/snv.vcf
+Donor2    Tumor    Material    Normal    Material    WGS    2023-01-02    GRCh37    vcf    omics/WGS/Donor2/indel.vcf
+Donor3    Tumor    Material    Normal    Material    WGS    2023-01-03    GRCh37    cmd/dna-sm   omics/WGS/Donor3/snv.tsv
+Donor3    Tumor    Material    Normal    Material    WGS    2023-01-03    GRCh37    cmd/dna-sm   omics/WGS/Donor3/indel.tsv
 ```
 
-- `folder` - Relative (if `UNITE_DATA_PATH` is set) or absolute path to the folder where the crawler should look for files.
-- `crawler` - Name of the crawler to use. Application will expect the following:
-    - There is a subfolder in the configuration folder (`UNITE_CONFIG_PATH`) with the **same** name as configured crawler.
-    - There is an file in configured crawler folder with the name **'crawler'**.
-- `types` - Comma separated list of [data types](./Docs/types.md) to look for in configured folder.
+The `path` specified in the sample sheet should be relative to the `<path>` argument passed to the crawler application.
 
-**For example:**
+### Custom Readers
+Reader is a custom command line application which reads the content of the file and returns it in the format required by the UNITE Portal.
+
+#### Input
+The application should accept the following arguments as an input:
+1. `<path>` as a first argument - Absolute path to the file to read.
+
+#### Output
+The application should output the content of the file in the format of corresponding type required by the UNITE Portal.
+
+### Example
+Let's assume, that the data source service is running in the docker container.  
+The data on the server located at `/mnt/data` location.  
+The configuration of the service is located at `/srv/config` location (`config.tsv`, crawlers and their readers should be stored here).  
+The cache of the service is located at `/srv/cache` location.
+
+#### Environment Variables
+The following environment variables are set:
+- `UNITE_DATA_PATH` - is set to `/data`, so the service will look for files in `/data` folder (inside the container).
+- `UNITE_CONFIG_PATH` - is set to `/config`, so the service will look for configuration files in `/config` folder (inside the container).
+- `UNITE_CACHE_PATH`- is set to `/cache`, so the service will cache the files in `/cache` folder (inside the container).
+
+#### Volumes
+The following volumes are mounted to the container from the file system:
+- `/mnt/data` to `/data` - to five container access to the data files.
+- `/srv/config` to `/config` - to provide the service with configuration files.
+- `/srv/cache` to `/cache` - to provide the service with cache folder.
+
+#### Data Files
+The data files are located in the `/mnt/data` folder on the server, e.g.:
 ```txt
-- /srv/config
-    config.tsv
-    - my-crawler
-        crawler
+- /mnt/data/project1/omics/WGS/
+    - dna.tsv
+    - dna-sm.tsv
+    - dna-cnv.tsv
+    - dna-sv.tsv
+    - donor1
+        - normal.bam
+        - normal.bam.bai
+        - tumor.bam
+        - tumor.bam.bai
+        - snv.vcf
+        - indel.vcf
+        - cnv.tsv
+        - sv.tsv
 ```
 
-> [!Note]
-> If there is no crawlers configured, the application will do nothing.
+Where:
+- `../project1` - is a folder with data of the project (samples sheet files are expected to be here).
+    - `dna.tsv` - is a sample sheet with metadata of the [DNA samples](./Docs//types.md#sample).
+    - `dna-sm.tsv` - is a sample sheet with metadata of the [DNA simple mutations](./Docs/types.md#simple-mutations).
+    - `dna-cnv.tsv` - is a sample sheet with metadata of the [DNA copy number variants](./Docs/types.md#copy-number-variants).
+    - `dna-sv.tsv` - is a sample sheet with metadata of the [DNA structural variants](./Docs/types.md#structural-variants).
+    - `donor1` - is a folder with data of the donor.
+        - `normal.bam`, `normal.bam.bai`, `tumor.bam`, `tumor.bam.bai` - are [DNA sample](./Docs/types.md#sample) files.
+        - `snv.vcf`, `indel.vcf` - are [DNA simple mutations](./Docs/types.md#simple-mutations) files in **vcf** format.
+        - `cnv.tsv` - is a [DNA copy number variants](./Docs/types.md#copy-number-variants) file in **ACESeq** format.
+        - `sv.tsv` - is a [DNA structural variants](./Docs/types.md#structural-variants) file in custom format.
 
-> [!Warning]
-> It's highly recommended to configure `UNITE_DATA_PATH` to desired root folder, so that the application can work with relative locations of the files and can run properly on different environments (e.g. local or docker) without changing the configuration. Otherwise, if you host the application on a different server, all links to hosted files will be **broken**.
+Contend of the `dna.tsv` file:
+```tsv
+donor_id	specimen_id	specimen_type   analysis_type	analysis_date	genome  format  path
+Donor1    Tumor    Material    WGS    2023-01-01    GRCh37    bam   omics/WGS/Donor1/normal.bam
+Donor1    Tumor    Material    WGS    2023-01-01    GRCh37    bam   omics/WGS/Donor1/normal.bam.bai
+Donor1    Normal   Material    WGS    2023-01-01    GRCh37    bam   omics/WGS/Donor1/tumor.bam
+Donor1    Normal   Material    WGS    2023-01-01    GRCh37    bam   omics/WGS/Donor1/tumor.bam.bai
+```
+
+Content of the `dna-sm.tsv` file:
+```tsv
+donor_id	specimen_id	specimen_type	matched_specimen_id	matched_specimen_type    analysis_type	analysis_date	genome	reader	path
+Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    vcf    omics/WGS/Donor1/snv.vcf
+Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    vcf    omics/WGS/Donor1/indel.vcf
+```
+
+Content of the `dna-cnv.tsv` file:
+```tsv
+donor_id	specimen_id	specimen_type	matched_specimen_id	matched_specimen_type    analysis_type	analysis_date	genome  purity  ploidy    reader	path
+Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    0.9    2.0  aceseq    omics/WGS/Donor1/cnv.tsv
+```
+
+Content of the `dna-sv.tsv` file:
+```tsv
+donor_id	specimen_id	specimen_type	matched_specimen_id	matched_specimen_type    analysis_type	analysis_date	genome  reader	path
+Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    cmd/sv    omics/WGS/Donor1/sv.tsv
+```
+
+#### Configuration Files
+The configuration files are located in the `/srv/config` folder on the server, e.g.:
+```txt
+- /srv/config/
+    config.tsv
+    - my-crawler/
+        - readers/
+            sv
+```
+
+Where:
+- `config.tsv` - is a configuration file with information about the folders to explore.
+- `my-crawler` - is a folder with custom crawler and readers.
+    - `readers` - is a folder with custom readers for different data types.
+        - `sv` - is a custom reader application for [DNA structural variants](./Docs/types.md#structural-variants) files.
+
+#### Configuration File
+The configuration file `config.tsv` in the `/srv/config` folder has the following content:
+```tsv
+path    types   crawler
+project dna, dna-sm, dna-cnv, dna-sv  my-crawler
+```
+
+Where:
+- `path` - is set to `project` - relative path to the folder with data mapped to the location of the data files in the container (`/data/project`).  
+           The service will look for the sample sheet files in this folder.
+- `types` - is set to `dna`, `dna-sm`, `dna-cnv`, `dna-sv` - to look for files of these types in the configured folder.
+- `crawler` - is set to `my-crawler` - to name of the folder with the custom crawler and readers in the configuration folder (`/config/my-crawler`).
 
 
-## Installation
-
-[.NET 8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) SDK is **required** to build and publish the application.
-
-1) Open the terminal.
-
-2) Add UNITE GitHub packages source for required **user** and **token** ([create](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) it if needed):
-    ```bash
-    dotnet nuget add source https://nuget.pkg.github.com/dkfz-unite/index.json -n github -u ${USER} -p ${TOKEN} --store-password-in-clear-text
-    ```
-
-3) Open project sources folder, e.g. `~/projects/unite-data-source`:
-    ```bash
-    cd ~/projects/unite-data-source
-    ```
-
-4) Build and publish the application to desired location where it's gonna be running on the server, e.g. `/srv/app`:
-    ```bash
-    dotnet publish Unite.Data.Source.Web -c Release -o /srv/app -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:DebugType=None --self-contained   
-    ```
-
-5) Navigate to just published application folder:
-    ```bash
-    cd /srv/app
-    ```
-
-6) Run and host the application publicly on the server:
-    ```bash
-    ./Unite.Data.Source.Web --urls http://0.0.0.0:80
-    ```
-
-7) Configure the application:
-
-    If configuration location wasn't changed in the previous steps, the application will expect configuration files to be in `./config` folder relative to where the app is running (e.g. `/srv/app/config`).
-
-    - Prepare the configuration file `config.tsv` with information about the crawlers, which folders they should explore to find files with data of considered types.  
-    E.g. you have one crawler `org` which should look for files with genomic data of different types in different project folders relative to configured `/data` root folder:
-        ```tsv
-        folder  crawler types
-        org/proj_a    org dna, dna-sm, dna-cnv, dna-sv, rna, rna-exp
-        org/proj_b    org dna, dna-sm, dna-cnv, dna-sv, rna, rna-exp
-        org/proj_c    org dna, dna-sm, dna-cnv, dna-sv, rna, rna-exp
-        ```
-    - Put created configuration, required crawler and it's data readers to configuration folder to have the following structure:
-        ```txt
-        - /srv/app
-            Unite.Data.Source.Web
-            - config
-                config.tsv
-                - org
-                    crawler
-                    - readers
-                        sm
-                        cnv
-                        sv
-                        exp
-        ```
-
-8) Application will do the folling:
-    - Use the crawler `org` and run it for every listed (`dna`, `dna-sm`, `dna-cnv`, `dna-sv`, `rna`, `rna-exp`) data type to find corresponding files in configured project folders relative to configured `/data/` folder: `/data/org/proj_a`, `/data/org/proj_b`, `/data/org/proj_c`.
-    - If the found file is of a resource data [type](./Docs/types.md#resources) (e.g. DAM file):
-        - File metadata will be sent to UNITE Portal with newly generated file key (e.g. `1234567890`).
-        - File will be hosted by the application and will be accessible by the public application url: `http://source.data.unite.net/api/files/1234567890`.
-    - If the found file contains data (e.g. DNA sm data):
-        - Corresponding reader will be used to read the content of the file.
-        - File data and it's metadata will be sent to UNITE Portal for further processing and integration.
-
-> [!Warning]
-> If you stop the application, the hosted files will be no longer accessible by their urls.
-
-> [!Note]
-> It's recommended to host the application separatelly from UNITE Portal and closer to the data, to keep access to the files fast and reliable.
-
-![Example architecture](./Docs/architecture.jpg)
