@@ -15,6 +15,7 @@ public record ResultFile
     public const string AnalysisDayColumn = "analysis_day";
     public const string PurityColumn = "purity";
     public const string PloidyColumn = "ploidy";
+    public const string CellsColumn = "cells";
     public const string GenomeColumn = "genome";
     public const string FormatColumn = "format";
     public const string ReaderColumn = "reader";
@@ -53,6 +54,9 @@ public record ResultFile
     [Column(PloidyColumn)]
     public string Ploidy { get; set; }
 
+    [Column(CellsColumn)]
+    public string Cells { get; set; }
+
     [Column(GenomeColumn)]
     public string Genome { get; set; }
 
@@ -79,6 +83,7 @@ public record ResultFile
             .AddField(AnalysisDayColumn, AnalysisDay)
             .AddField(PurityColumn, Purity)
             .AddField(PloidyColumn, Ploidy)
+            .AddField(CellsColumn, Cells)
             .AddField(GenomeColumn, Genome);
     }
 
@@ -86,6 +91,6 @@ public record ResultFile
     {
         var name = System.IO.Path.GetFileName(Path);
 
-        return new Resource(name, type, Format, null, url);
+        return new Resource(name, type, Format, url);
     }
 }

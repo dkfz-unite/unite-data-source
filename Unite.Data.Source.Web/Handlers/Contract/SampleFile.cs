@@ -63,6 +63,6 @@ public record SampleFile
     {
         var name = System.IO.Path.GetFileName(Path);
 
-        return new Resource(name, type, Format, null, url);
+        return new Resource(name, type, Format, url);
     }
 }

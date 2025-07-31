@@ -23,7 +23,7 @@ Metadata:
 - `analysis_type`__*__ - Sample analysis (sequencing) type (`WES`, `WGS`).
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
-- `genome` - Sample genome version (`GRCh37` or `GRCh38`).
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
 - `format`__*__ - File format (`fasta`, `fastq`, `bam`, `bam.bai`, `bam.bai.md5`).
 - `path`__*__ - Path to the file.
 
@@ -55,7 +55,7 @@ Metadata:
 - `analysis_type`__*__ - Sample analysis (sequencing) type (`WES`, `WGS`).
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
-- `genome` - Sample genome version (`GRCh37` or `GRCh38`).
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
 - `reader` - File reaeder / data format (`tsv`, `vcf` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
@@ -87,7 +87,7 @@ Metadata:
 - `analysis_type`__*__ - Sample analysis (sequencing) type (`WES`, `WGS`).
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
-- `genome` - Sample genome version (`GRCh37` or `GRCh38`).
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
 - `purity` - Estimated sample purity, if available (e.g. `0.8` for 80%).
 - `ploidy` - Estimated sample ploidy, if available (e.g. `2` for diploid, used by default).
 - `reader` - File reader / data format (`tsv`, `aceseq` or custom `cmd/{name}`).
@@ -118,7 +118,7 @@ Metadata:
 - `analysis_type`__*__ - Sample analysis (sequencing) type (`WES`, `WGS`).
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
-- `genome` - Sample genome version (`GRCh37` or `GRCh38`).
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
 - `reader` - File reader / data format (`tsv`, `dkfz/sophia` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
@@ -147,7 +147,7 @@ Metadata:
 - `analysis_type`__*__ - Sample analysis (sequencing) type (`MethArray`, `WGBS`, `RRBS`).
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
-- `genome` - Sample genome version (`GRCh37` or `GRCh38`).
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
 - `format`__*__ - Sample file format (`idat`, `fasta`, `fastq`, `bam`, `bam.bai`, `bam.bai.md5`).
 - `path`__*__ - Path to the file.
 
@@ -179,7 +179,7 @@ Metadata:
 - `analysis_type`__*__ - Sample analysis (sequencing) type (`RNASeq`).
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
-- `genome` - Sample genome version (`GRCh37` or `GRCh38`).
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
 - `format`__*__ - Sample file format (`fasta`, `fastq`, `bam`, `bam.bai`, `bam.bai.md5`).
 - `path`__*__ - Path to the file.
 
@@ -207,7 +207,7 @@ Metadata:
 - `analysis_type`__*__ - Sample analysis (sequencing) type (`RNASeq`).
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
-- `genome` - Sample genome version (`GRCh37` or `GRCh38`).
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
 - `reader` - File reader / data format (`tsv`, `dkfz/rnaseq` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
@@ -236,7 +236,7 @@ Metadata:
 - `analysis_type`__*__ - Sample analysis (sequencing) type (`scRNASeq`, `snRNASeq`).
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
-- `genome` - Sample genome version (`GRCh37` or `GRCh38`).
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
 - `format`__*__ - Sample file format (`fasta`, `fastq`, `bam`, `bam.bai`, `bam.bai.md5`).
 - `path`__*__ - Path to the file.
 
@@ -263,7 +263,8 @@ Metadata:
 - `analysis_type`__*__ - Sample analysis (sequencing) type (`scRNASeq`, `snRNASeq`).
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
-- `genome` - Sample genome version (`GRCh37` or `GRCh38`).
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `cells` - Number of cells.
 - `format`__*__ - Resource file format (`mtx`, `tsv`).
 - `path`__*__ - Path to the file.
 
@@ -274,10 +275,10 @@ Do not change the file names.
 #### Example
 `/mnt/data/project/rnasc-exp.tsv`
 ```tsv
-donor_id	specimen_id	specimen_type	analysis_type	analysis_date	genome	format	path
-Donor1    Tumor    Material	scRNASeq    2023-01-01    GRCh38    tsv    omics/scRNASeq/Donor1/barcodes.tsv.gz
-Donor1    Tumor    Material	scRNASeq    2023-01-01    GRCh38    tsv    omics/scRNASeq/Donor1/features.tsv.gz
-Donor1    Tumor    Material	scRNASeq    2023-01-01    GRCh38    mtx    omics/scRNASeq/Donor1/matrix.mtx.gz
+donor_id	specimen_id	specimen_type	analysis_type	analysis_date	genome  cells	format	path
+Donor1    Tumor    Material	scRNASeq    2023-01-01    GRCh38    tsv 5700    omics/scRNASeq/Donor1/barcodes.tsv.gz
+Donor1    Tumor    Material	scRNASeq    2023-01-01    GRCh38    tsv 5700    omics/scRNASeq/Donor1/features.tsv.gz
+Donor1    Tumor    Material	scRNASeq    2023-01-01    GRCh38    mtx 5700    omics/scRNASeq/Donor1/matrix.mtx.gz
 ```
 
 #
