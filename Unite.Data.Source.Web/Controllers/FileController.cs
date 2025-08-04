@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Source.Web.Configuration.Options;
 using Unite.Data.Source.Web.Handlers;
@@ -50,6 +49,6 @@ public class FileController : Controller
         if (string.IsNullOrWhiteSpace(dataPath))
             return filePath;
         
-        return dataPath + filePath;
+        return Path.Combine(dataPath, filePath);
     }
 }

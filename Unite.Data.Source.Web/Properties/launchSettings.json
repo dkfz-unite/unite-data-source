@@ -15,7 +15,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "UNITE_API_KEY": "Defautl32BitApiKeyHasToBeChanged",
-        "UNITE_WORKER_HOST": "http://localhost:5300",
+        "UNITE_WORKER_HOST": "http://localhost:5400",
         "UNITE_WORKER_TOKEN": "DefaultJWTApiTokenHasToBeChanged",
         "UNITE_PORTAL_HOST": "http://localhost",
         "UNITE_FEED_DONORS_HOST": "http://localhost:5100",
@@ -30,11 +30,11 @@
     "Unite.Data.Source.Web": {
       "commandName": "Project",
       "launchUrl": "api",
-      "applicationUrl": "http://localhost:5300",
+      "applicationUrl": "http://localhost:5400",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "UNITE_API_KEY": "Defautl32BitApiKeyHasToBeChanged",
-        "UNITE_WORKER_HOST": "http://localhost:5300",
+        "UNITE_WORKER_HOST": "http://localhost:5400",
         "UNITE_WORKER_TOKEN": "DefaultJWTApiTokenHasToBeChanged",
         "UNITE_PORTAL_HOST": "http://localhost",
         "UNITE_FEED_DONORS_HOST": "http://localhost:5100",

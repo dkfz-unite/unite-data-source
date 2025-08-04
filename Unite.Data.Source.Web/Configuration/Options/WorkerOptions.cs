@@ -15,7 +15,7 @@ public class WorkerOptions
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentNullException("'UNITE_WORKER_HOST' environment variable has to be set");
 
-            return value;
+            return AppendScheme(value);
         }
     }
 
@@ -33,5 +33,13 @@ public class WorkerOptions
 
             return value;
         }
+    }
+
+    private string AppendScheme(string url)
+    {
+        if (url.StartsWith("http://") || url.StartsWith("https://"))
+            return url;
+        else
+            return $"http://{url}";
     }
 }
