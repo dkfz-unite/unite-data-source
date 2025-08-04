@@ -1,8 +1,8 @@
 namespace Unite.Data.Source.Web.Handlers.Constants;
 
-public static class Urls
+public static class DataUrls
 {
-    private const string _format = "tsv";
+    private const string _format = "file";
 
     public static class Donor
     {
