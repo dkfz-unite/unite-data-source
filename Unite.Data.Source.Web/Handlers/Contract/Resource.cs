@@ -2,7 +2,7 @@ using Unite.Essentials.Tsv.Attributes;
 
 namespace Unite.Data.Source.Web.Handlers.Contract;
 
-public record Resource
+public class Resource
 {
     [Column("name")]
     public string Name { get; set; }
