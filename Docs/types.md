@@ -119,7 +119,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
-- `reader` - File reader / data format (`tsv`, `dkfz/sophia` or custom `cmd/{name}`).
+- `reader` - File reader / data format (`tsv`, `dkfz-sophia` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
 #### Example
@@ -208,7 +208,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
-- `reader` - File reader / data format (`tsv`, `dkfz/rnaseq` or custom `cmd/{name}`).
+- `reader` - File reader / data format (`tsv`, `dkfz-rnaseq` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
 #### Example
