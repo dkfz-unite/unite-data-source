@@ -3,7 +3,7 @@ using Unite.Essentials.Tsv.Attributes;
 
 namespace Unite.Data.Source.Web.Handlers.Contract;
 
-public record ResultFile
+public class ResultFile
 {
     public const string DonorIdColumn = "donor_id";
     public const string SpecimenIdColumn = "specimen_id";
@@ -68,6 +68,31 @@ public record ResultFile
 
     [Column(PathColumn)]
     public string Path { get; set; }
+
+
+    public override bool Equals(object obj)
+    {
+        return obj is ResultFile file &&
+               DonorId == file.DonorId &&
+               SpecimenId == file.SpecimenId &&
+               SpecimenType == file.SpecimenType &&
+               MatchedSpecimenId == file.MatchedSpecimenId &&
+               MatchedSpecimenType == file.MatchedSpecimenType &&
+               AnalysisType == file.AnalysisType &&
+               AnalysisDate == file.AnalysisDate &&
+               AnalysisDay == file.AnalysisDay &&
+               Purity == file.Purity &&
+               Ploidy == file.Ploidy &&
+               Cells == file.Cells &&
+               Genome == file.Genome;
+    }
+
+    public override int GetHashCode()
+    {
+        var part1 = HashCode.Combine(DonorId, SpecimenId, SpecimenType, AnalysisType, AnalysisDate, AnalysisDay, Genome);
+        var part2 = HashCode.Combine(MatchedSpecimenId, MatchedSpecimenType, Purity, Ploidy, Cells);
+        return HashCode.Combine(part1, part2);
+    }
 
 
     public MultipartFormDataContent AsForm()

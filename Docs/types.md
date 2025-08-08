@@ -59,6 +59,8 @@ Metadata:
 - `reader` - File reaeder / data format (`tsv`, `vcf` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-dna-sm.md#formats).
+
 #### Example
 `/mnt/data/project/dna-sm.tsv`
 ```tsv
@@ -93,6 +95,8 @@ Metadata:
 - `reader` - File reader / data format (`tsv`, `aceseq` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-dna-cnv.md#formats).
+
 #### Example
 `/mnt/data/project/dna-cnv.tsv`
 ```tsv
@@ -119,8 +123,10 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
-- `reader` - File reader / data format (`tsv`, `dkfz/sophia` or custom `cmd/{name}`).
+- `reader` - File reader / data format (`tsv`, `dkfz-sophia` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
+
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-dna-sv.md#formats).
 
 #### Example
 `/mnt/data/project/dna-sv.tsv`
@@ -208,8 +214,10 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
-- `reader` - File reader / data format (`tsv`, `dkfz/rnaseq` or custom `cmd/{name}`).
+- `reader` - File reader / data format (`tsv`, `dkfz-rnaseq` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
+
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-rna-exp.md#formats).
 
 #### Example
 `/mnt/data/project/rna-exp.tsv`

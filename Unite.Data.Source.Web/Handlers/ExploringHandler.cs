@@ -78,6 +78,9 @@ public class ExploringHandler
                 if (type.Contains('-')) // Result file
                 {
                     var files = TsvReader.Read<ResultFile>(tsv).ToArray();
+                    
+                    // TODO: Handle groups
+                    // var groups = files.GroupBy(file => file);
 
                     foreach (var file in files)
                     {
@@ -161,6 +164,9 @@ public class ExploringHandler
                 else // Sample file
                 {
                     var files = TsvReader.Read<SampleFile>(tsv).ToArray();
+                    
+                    // TODO: Handle groups
+                    // var groups = files.GroupBy(file => file);
 
                     foreach (var file in files)
                     {
