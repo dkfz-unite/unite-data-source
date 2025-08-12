@@ -68,7 +68,7 @@ public class ExploringHandler
 
                 var tsv = sheetExists
                     ? await File.ReadAllTextAsync(sheetPath)
-                    : await Command.Run(crawlerPath, type, folderConfig.Path, folderConfig.Args);
+                    : await Command.Run(crawlerPath, type, Path.Combine(_configOptions.DataPath, folderConfig.Path), folderConfig.Args);
                
                 if (string.IsNullOrWhiteSpace(tsv))
                 {
