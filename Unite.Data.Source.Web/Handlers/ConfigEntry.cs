@@ -13,6 +13,11 @@ public class ConfigEntry
     public string Crawler { get; set; }
 
     /// <summary>
+    /// Arguments to pass to the crawler (e.g. "arg1=val1,arg2=val2").
+    [Column("args")]
+    public string Args { get; set; }
+
+    /// <summary>
     /// Types of the data to be found by the crawler (e.g. dna, dna/sm, dna/cnv, dna/sv, rna, rna/exp, rnasc, rnasc/exp, etc.).
     /// </summary>
     [Column("types", typeof(StringArrayConverter))]

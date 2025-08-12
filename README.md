@@ -40,14 +40,15 @@ To configure the application, change environment variables in either docker or [
 ### Folders Configuration
 To configure the service, to explore required data, create a configuration file `config.tsv` in the configuration folder (`UNITE_CONFIG_PATH`) with the following structure:
 ```tsv
-path    types   crawler
-relative/path/to/folder dna, dna-sm, dna-cnv, dna-sv, meth, rna, rna-exp, rnasc, rnasc-exp  default
+path    types   crawler args
+relative/path/to/folder dna, dna-sm, dna-cnv, dna-sv, meth, rna, rna-exp, rnasc, rnasc-exp  default mapping.tsv
 ```
 
 Where:
 - `path` - Relative (if `UNITE_DATA_PATH` is set) or absolute path to the folder where the service should look for the files.
 - `types` - Comma separated list of the [data types](./Docs/types.md), files of which the service should look for in configured folder.
 - `crawler` - Name of the crawler directory with custom crawler and readers.
+- `args` - Optional arguments for the crawler application, e.g. `mapping.tsv` - to specify the mapping file for the crawler (path is always relative to the crawler).
     
 
 ### Workflow
@@ -181,6 +182,7 @@ The configuration files are located in the `/srv/config` folder on the server, e
 - /srv/config/
     config.tsv
     - my-crawler/
+        mapping.tsv
         - readers/
             sv
 ```
@@ -188,14 +190,15 @@ The configuration files are located in the `/srv/config` folder on the server, e
 Where:
 - `config.tsv` - is a configuration file with information about the folders to explore.
 - `my-crawler` - is a folder with custom crawler and readers.
+    - `mapping.tsv` - mapping file for the custom crawler application.
     - `readers` - is a folder with custom readers for different data types.
         - `sv` - is a custom reader application for [DNA structural variants](./Docs/types.md#structural-variants) files.
 
 #### Configuration File
 The configuration file `config.tsv` in the `/srv/config` folder has the following content:
 ```tsv
-path    types   crawler
-project dna, dna-sm, dna-cnv, dna-sv  my-crawler
+path    types   crawler args
+project dna, dna-sm, dna-cnv, dna-sv  my-crawler    mapping.tsv
 ```
 
 Where:
@@ -203,5 +206,4 @@ Where:
            The service will look for the sample sheet files in this folder.
 - `types` - is set to `dna`, `dna-sm`, `dna-cnv`, `dna-sv` - to look for files of these types in the configured folder.
 - `crawler` - is set to `my-crawler` - to name of the folder with the custom crawler and readers in the configuration folder (`/config/my-crawler`).
-
-
+- `args` - is set to `mapping.tsv` - to specify the mapping file for the crawler application (path is always relative to the crawler).
