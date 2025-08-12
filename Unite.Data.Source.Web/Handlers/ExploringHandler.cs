@@ -59,7 +59,7 @@ public class ExploringHandler
                 var crawlerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "crawler");
                 var crawlerExists = File.Exists(crawlerPath);
 
-                if (!sheetExists && !sheetExists)
+                if (!sheetExists && !crawlerExists)
                 {
                     _logger.LogWarning("Sheet file '{path}' does not exist for type '{type}'", sheetPath, type);
                     _logger.LogWarning("Crawler '{path}' does not exist for type '{type}'", crawlerPath, type);
