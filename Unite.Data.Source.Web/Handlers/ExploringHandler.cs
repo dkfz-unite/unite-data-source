@@ -61,7 +61,8 @@ public class ExploringHandler
 
                 if (!sheetExists && !sheetExists)
                 {
-                    _logger.LogWarning("Neither crawler nor sheet file exists for type '{type}'", type);
+                    _logger.LogWarning("Sheet file '{path}' does not exist for type '{type}'", sheetPath, type);
+                    _logger.LogWarning("Crawler '{path}' does not exist for type '{type}'", crawlerPath, type);
                     continue;
                 }
 
