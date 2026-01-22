@@ -51,159 +51,192 @@ public class ExploringHandler
 
         foreach (var folderConfig in folderConfigs)
         {
-            foreach (var type in folderConfig.Types)
-            {                
-                var sheetPath = Path.Combine(_configOptions.DataPath, folderConfig.Path, $"{type}.tsv");
-                var sheetExists = File.Exists(sheetPath);
-
-                var crawlerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "crawler");
-                var crawlerExists = File.Exists(crawlerPath);
-
-                if (!sheetExists && !crawlerExists)
-                {
-                    _logger.LogWarning("Sheet file '{path}' does not exist for type '{type}'", sheetPath, type);
-                    _logger.LogWarning("Crawler '{path}' does not exist for type '{type}'", crawlerPath, type);
-                    continue;
-                }
-
-                var tsv = sheetExists
-                    ? await File.ReadAllTextAsync(sheetPath)
-                    : await Command.Run(crawlerPath, type, Path.Combine(_configOptions.DataPath, folderConfig.Path), folderConfig.Args);
-               
-                if (string.IsNullOrWhiteSpace(tsv))
-                {
-                    _logger.LogWarning("Sheet content is empty for type '{type}'", type);
-                    continue;
-                }
-
-                if (type.Contains('-')) // Result file
-                {
-                    var files = TsvReader.Read<ResultFile>(tsv).ToArray();
-                    
-                    // TODO: Handle groups
-                    // var groups = files.GroupBy(file => file);
-
-                    foreach (var file in files)
-                    {
-                        var pathRelative = Path.Combine(folderConfig.Path, file.Path);
-                        var pathAbsolute = Path.Combine(_configOptions.DataPath, pathRelative);
-
-                        if (_foundFilesCache.Contains(pathRelative) || _errorFilesCache.Contains(pathRelative))
-                            continue;
-
-                        if (string.IsNullOrWhiteSpace(file.Reader)) // File is a resource
-                        {
-                            var key = Guid.NewGuid().ToString();
-                            var url = $"{_workerOptions.Host}/api/file/{key}";
-                            var resource = file.AsResource(type, url);
-
-                            try
-                            {
-                                var content = TsvWriter.Write([resource]);
-                                using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                                var form = file.AsForm().AddField(ResultFile.ResourcesColumn, "resources.tsv", stream);
-
-                                await UploadResult(type, form, null);
-
-                                _hostFilesCache.Add(key, pathRelative);
-                                _foundFilesCache.Add(pathRelative);
-                                _logger.LogInformation("Uploaded and hosted file '{key}' '{path}'", key, pathRelative);
-                            }
-                            catch (Exception ex)
-                            {
-                                _errorFilesCache.Add(pathRelative);
-                                _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
-
-                                continue;
-                            }
-                        }
-                        else if (file.Reader.StartsWith("cmd/")) // File has custom reader
-                        {
-                            var readerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "readers", file.Reader[4..]);
-
-                            try
-                            {
-                                var content = await Command.Run(readerPath, pathAbsolute);
-                                using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                                var form = file.AsForm().AddField(ResultFile.EntriesColumn, "entries.tsv", stream);
-
-                                await UploadResult(type, form, file.Reader);
-
-                                _foundFilesCache.Add(pathRelative);
-                                _logger.LogInformation("Uploaded file '{path}'", pathRelative);
-                            }
-                            catch (Exception ex)
-                            {
-                                _errorFilesCache.Add(pathRelative);
-                                _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
-
-                                continue;
-                            }
-                        }
-                        else // File has standard reader
-                        {
-                            try
-                            {
-                                using var stream = File.OpenRead(pathAbsolute);
-                                var form = file.AsForm().AddField(ResultFile.EntriesColumn, "entries.tsv", stream);
-
-                                await UploadResult(type, form, file.Reader);
-
-                                _foundFilesCache.Add(pathRelative);
-                                _logger.LogInformation("Uploaded file '{path}'", pathRelative);
-                            }
-                            catch (Exception ex)
-                            {
-                                _errorFilesCache.Add(pathRelative);
-                                _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
-
-                                continue;
-                            }
-                        }
-                    }
-                }
-                else // Sample file
-                {
-                    var files = TsvReader.Read<SampleFile>(tsv).ToArray();
-                    
-                    // TODO: Handle groups
-                    // var groups = files.GroupBy(file => file);
-
-                    foreach (var file in files)
-                    {
-                        var pathRelative = Path.Combine(folderConfig.Path, file.Path);
-                        var pathAbsolute = Path.Combine(_configOptions.DataPath, pathRelative);
-
-                        if (_foundFilesCache.Contains(pathRelative) || _errorFilesCache.Contains(pathRelative))
-                            continue;
-
-                        var key = Guid.NewGuid().ToString();
-                        var url = $"{_workerOptions.Host}/api/file/{key}";
-                        var resource = file.AsResource(type, url);
-
-                        try
-                        {
-                            var content = TsvWriter.Write([resource]);
-                            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                            var form = file.AsForm().AddField(SampleFile.ResourcesColumn, "resources.tsv", stream);
-
-                            await UploadSample(type, form);
-
-                            _hostFilesCache.Add(key, pathRelative);
-                            _foundFilesCache.Add(pathRelative);
-                            _logger.LogInformation("Uploaded and hosted file '{key}' '{path}'", key, pathRelative);
-                        }
-                        catch (Exception ex)
-                        {
-                            _errorFilesCache.Add(pathRelative);
-                            _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
-                        }
-                    }
-                }
-            }
+            await HandleConfigEntry(folderConfig);
         }
 
         await Task.CompletedTask;
+    }
+    
+    private async Task HandleConfigEntry(ConfigEntry folderConfig)
+    {
+        foreach (var type in folderConfig.Types)
+        {                
+            var tsv = await LoadTsvSheet(folderConfig, type);
+
+            if (string.IsNullOrWhiteSpace(tsv))
+            {
+                _logger.LogWarning("Sheet content is empty for type '{type}'", type);
+                continue;
+            }
+            
+            //TODO: not a clear way to distinguish between different resource types(use more explicit way to describe a file type, better not '-' symbol)
+            if (type.Contains('-')) // Result file
+            {
+                await HandleResultFile(folderConfig, tsv, type);
+            }
+            else // Sample file
+            {
+                await HandleSampleFile(folderConfig, tsv, type);
+            }
+        }
+    }
+    
+    private async Task HandleResultFile(ConfigEntry folderConfig, string tsv, string type)
+    {
+        // TODO: Handle groups
+        // var groups = files.GroupBy(file => file);
+
+        var files = TsvReader.Read<ResultFile>(tsv).ToArray();
+        
+        foreach (var file in files)
+        {
+            var pathRelative = Path.Combine(folderConfig.Path, file.Path);
+            var pathAbsolute = Path.Combine(_configOptions.DataPath, pathRelative);
+
+            if (_foundFilesCache.Contains(pathRelative) || _errorFilesCache.Contains(pathRelative))
+                continue;
+
+            //TODO: It would be better to use field 'ResourceType' instead of 'Reader' as an additional config field
+            if (string.IsNullOrWhiteSpace(file.Reader)) // File is a resource
+            {
+                await FeedFileAsLargeResource(type, file, pathRelative);
+            }
+            else if (file.Reader.StartsWith("cmd/")) // File has custom reader
+            {
+                await FeedFileAsCustomResource(folderConfig, type, file, pathAbsolute, pathRelative);
+            }
+            else // File has standard reader
+            {
+                await FeedFileAsStandardResource(type, file, pathAbsolute, pathRelative);
+            }
+        }
+    }
+    
+    private async Task FeedFileAsLargeResource(string type, ResultFile file, string pathRelative)
+    {
+        var key = Guid.NewGuid().ToString();
+        var url = $"{_workerOptions.Host}/api/file/{key}";
+        var resource = file.AsResource(type, url);
+
+        try
+        {
+            var content = TsvWriter.Write([resource]);
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+            var form = file.AsForm().AddField(ResultFile.ResourcesColumn, "resources.tsv", stream);
+
+            await UploadResult(type, form, null);
+
+            _hostFilesCache.Add(key, pathRelative);
+            _foundFilesCache.Add(pathRelative);
+            _logger.LogInformation("Uploaded and hosted file '{key}' '{path}'", key, pathRelative);
+        }
+        catch (Exception ex)
+        {
+            _errorFilesCache.Add(pathRelative);
+            _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
+        }
+    }
+    
+    private async Task FeedFileAsCustomResource(ConfigEntry folderConfig, string type, ResultFile file, string pathAbsolute,
+        string pathRelative)
+    {
+        var readerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "readers", file.Reader[4..]);
+
+        try
+        {
+            var content = await Command.Run(readerPath, pathAbsolute);
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+            var form = file.AsForm().AddField(ResultFile.EntriesColumn, "entries.tsv", stream);
+
+            await UploadResult(type, form, file.Reader);
+
+            _foundFilesCache.Add(pathRelative);
+            _logger.LogInformation("Uploaded file '{path}'", pathRelative);
+        }
+        catch (Exception ex)
+        {
+            _errorFilesCache.Add(pathRelative);
+            _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
+        }
+    }
+
+    private async Task FeedFileAsStandardResource(string type, ResultFile file, string pathAbsolute, string pathRelative)
+    {
+        try
+        {
+            using var stream = File.OpenRead(pathAbsolute);
+            var form = file.AsForm().AddField(ResultFile.EntriesColumn, "entries.tsv", stream);
+
+            await UploadResult(type, form, file.Reader);
+
+            _foundFilesCache.Add(pathRelative);
+            _logger.LogInformation("Uploaded file '{path}'", pathRelative);
+        }
+        catch (Exception ex)
+        {
+            _errorFilesCache.Add(pathRelative);
+            _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
+        }
+    }
+
+    private async Task HandleSampleFile(ConfigEntry folderConfig, string tsv, string type)
+    {
+        var files = TsvReader.Read<SampleFile>(tsv).ToArray();
+
+        // TODO: Handle groups
+        // var groups = files.GroupBy(file => file);
+
+        foreach (var file in files)
+        {
+            var pathRelative = Path.Combine(folderConfig.Path, file.Path);
+            var pathAbsolute = Path.Combine(_configOptions.DataPath, pathRelative);
+
+            if (_foundFilesCache.Contains(pathRelative) || _errorFilesCache.Contains(pathRelative))
+                continue;
+
+            var key = Guid.NewGuid().ToString();
+            var url = $"{_workerOptions.Host}/api/file/{key}";
+            var resource = file.AsResource(type, url);
+
+            try
+            {
+                var content = TsvWriter.Write([resource]);
+                using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+                var form = file.AsForm().AddField(SampleFile.ResourcesColumn, "resources.tsv", stream);
+
+                await UploadSample(type, form);
+
+                _hostFilesCache.Add(key, pathRelative);
+                _foundFilesCache.Add(pathRelative);
+                _logger.LogInformation("Uploaded and hosted file '{key}' '{path}'", key, pathRelative);
+            }
+            catch (Exception ex)
+            {
+                _errorFilesCache.Add(pathRelative);
+                _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
+            }
+        }
+    }
+
+    private async Task<string> LoadTsvSheet(ConfigEntry folderConfig, string type)
+    {
+        var sheetPath = Path.Combine(_configOptions.DataPath, folderConfig.Path, $"{type}.tsv");
+        var sheetExists = File.Exists(sheetPath);
+
+        var crawlerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "crawler");
+        var crawlerExists = File.Exists(crawlerPath);
+
+        if (!sheetExists && !crawlerExists)
+        {
+            _logger.LogWarning("Sheet file '{path}' does not exist for type '{type}'", sheetPath, type);
+            _logger.LogWarning("Crawler '{path}' does not exist for type '{type}'", crawlerPath, type);
+            return null;
+        }
+
+        var tsv = sheetExists
+            ? await File.ReadAllTextAsync(sheetPath)
+            : await Command.Run(crawlerPath, type, Path.Combine(_configOptions.DataPath, folderConfig.Path), folderConfig.Args);
+        return tsv;
     }
 
     private async Task UploadSample(string type, MultipartFormDataContent form, bool review = true)
