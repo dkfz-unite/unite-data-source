@@ -348,5 +348,35 @@ Donor2    Tumor    Material	MS    2023-01-02    GRCh37    diann    omics/MS/Dono
 Donor3    Tumor    Material	MS    2023-01-03    GRCh37    cmd/prot-exp   omics/MS/Donor3/tumor.tsv
 ```
 
+### Copy Number Variant Profiles
+Copy number variants profiles data, which is an aggregation of CNvs per chromosome arm.
+
+Key: `dna-cnvp`.  
+Sheet file name: `dna-cnvp.tsv`.  
+Subtype: `data`.
+
+Metadata:
+- `donor_id`__*__ - Donor identifier.
+- `specimen_id`__*__ - Specimen identifier.
+- `specimen_type`__*__ - Specimen type (`Material`, `Line`, `Organoid`, `Xenograft`).
+- `matched_specimen_id` - Matched specimen identifier, if the file is matched to another specimen during the processing.
+- `matched_specimen_type` - Matched specimen type, if the file is matched to another specimen during the processing.
+- `analysis_type`__*__ - Sample analysis (sequencing) type (`WES`, `WGS`).
+- `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
+- `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
+- `reader` - File reader / data format (`tsv`, `aceseq` or custom `cmd/{name}`).
+- `path`__*__ - Path to the file.
+
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-dna-cnvp.md#formats).
+
+#### Example
+`/mnt/data/project/dna-cnvp.tsv`
+```tsv
+donor_id	specimen_id	specimen_type	matched_specimen_id	matched_specimen_type    analysis_type	analysis_date	genome	reader	path
+Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    tsv    omics/WGS/Donor1/cnvp.tsv
+Donor2    Tumor    Material    Normal    Material    WGS    2023-01-02    GRCh37    aceseq    omics/WGS/Donor2/cnvp.tsv
+Donor3    Tumor    Material    Normal    Material    WGS    2023-01-03    GRCh37    cmd/cnv   omics/WGS/Donor3/cnvp.tsv
+```
+
 #
 __*__ - Required metadata fields.
