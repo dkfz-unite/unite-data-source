@@ -14,7 +14,7 @@ public static class DataTypes
     // spe-int
     // spe-drg
     // dna
-    // dna-ss
+    // dna-sm
     // dna-cnv
     // dna-sv
     // meth
@@ -23,6 +23,8 @@ public static class DataTypes
     // rna-exp
     // rnasc
     // rnasc-exp
+    // prot
+    // prot-exp
 
     public static class Donor
     {
@@ -81,6 +83,12 @@ public static class DataTypes
         {
             public const string Sample = "rnasc"; // Single cell RNA sample
             public const string Exp = "rnasc-exp"; // Single cell RNA expressions
+        }
+
+        public static class Prot
+        {
+            public const string Sample = "prot"; // Proteomics sample
+            public const string Exp = "prot-exp"; // Proteomics expressions
         }
     }
 }

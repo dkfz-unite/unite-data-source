@@ -289,5 +289,64 @@ Donor1    Tumor    Material	scRNASeq    2023-01-01    GRCh38    tsv 5700    omic
 Donor1    Tumor    Material	scRNASeq    2023-01-01    GRCh38    mtx 5700    omics/scRNASeq/Donor1/matrix.mtx.gz
 ```
 
+## Proteomics
+
+### Sample
+Proteomics sample files in different formats.
+
+Key: `prot`.  
+Sheet file name: `prot.tsv`.  
+Subtype: `resource`.
+
+Metadata:
+- `donor_id`__*__ - Donor identifier.
+- `specimen_id`__*__ - Specimen identifier.
+- `specimen_type`__*__ - Specimen type (`Material`, `Line`, `Organoid`, `Xenograft`).
+- `analysis_type`__*__ - Sample analysis (sequencing) type (`MS`).
+- `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
+- `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `format`__*__ - Sample file format (`mzML`, `mzXML`).
+- `path`__*__ - Path to the file.
+
+
+#### Example
+`/mnt/data/project/prot.tsv`
+```tsv
+donor_id	specimen_id	specimen_type	analysis_type	analysis_date	genome	format	path
+Donor1    Tumor    Material	MS    2023-01-01    GRCh37    bam    omics/MS/Donor1/tumor.mzML
+Donor2    Tumor    Material	MS    2023-01-02    GRCh37    bam    omics/MS/Donor2/tumor.mzXML
+Donor3    Tumor    Material	MS    2023-01-03    GRCh37    bam    omics/MS/Donor3/tumor.mzML
+```
+
+### Expressions
+Proteomics expressions data, which is a result of the Proteomics expressions calling pipeline.
+
+Key: `prot-exp`.  
+Sheet file name: `prot-exp.tsv`.  
+Subtype: `data`.
+
+Metadata:
+- `donor_id`__*__ - Donor identifier.
+- `specimen_id`__*__ - Specimen identifier.
+- `specimen_type`__*__ - Specimen type (`Material`, `Line`, `Organoid`, `Xenograft`).
+- `analysis_type`__*__ - Sample analysis (sequencing) type (`MS`).
+- `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
+- `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `reader` - File reader / data format (`tsv`, `diann` or custom `cmd/{name}`).
+- `path`__*__ - Path to the file.
+
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-prot-exp.md#formats).
+
+#### Example
+`/mnt/data/project/prot-exp.tsv`
+```tsv
+donor_id	specimen_id	specimen_type	analysis_type	analysis_date	genome	reader	path
+Donor1    Tumor    Material	MS    2023-01-01    GRCh37    tsv    omics/MS/Donor1/tumor.tsv
+Donor2    Tumor    Material	MS    2023-01-02    GRCh37    diann    omics/MS/Donor2/tumor.tsv
+Donor3    Tumor    Material	MS    2023-01-03    GRCh37    cmd/prot-exp   omics/MS/Donor3/tumor.tsv
+```
+
 #
 __*__ - Required metadata fields.
