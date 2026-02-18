@@ -250,6 +250,7 @@ public class ExploringHandler
             DataTypes.Omics.Meth.Sample => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Meth.Sample}?review={review}",
             DataTypes.Omics.Rna.Sample => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Rna.Sample}?review={review}",
             DataTypes.Omics.Rnasc.Sample => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Rnasc.Sample}?review={review}",
+            DataTypes.Omics.Prot.Sample => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Prot.Sample}?review={review}",
             _ => throw new ArgumentException($"Unknown data type '{type}'")
         };
 
@@ -276,6 +277,7 @@ public class ExploringHandler
             DataTypes.Omics.Meth.Level => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Meth.Level}?review={review}",
             DataTypes.Omics.Rna.Exp => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Rna.Exp}?review={review}",
             DataTypes.Omics.Rnasc.Exp => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Rnasc.Exp}?review={review}",
+            DataTypes.Omics.Prot.Exp => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Prot.Exp}?review={review}",
             _ => throw new ArgumentException($"Unknown data type '{type}'")
         };
 

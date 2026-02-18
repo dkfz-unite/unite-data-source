@@ -29,5 +29,11 @@ public static class DataUrls
             public const string Sample = $"rnasc/sample"; // Single cell RNA sample
             public const string Exp = $"rnasc/analysis/exp"; // Single cell RNA expressions
         }
+
+        public static class Prot
+        {
+            public const string Sample = $"prot/sample"; // Proteomics sample
+            public const string Exp = $"prot/analysis/exp"; // Proteomics expressions
+        }
     }
 }
