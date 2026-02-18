@@ -64,6 +64,7 @@ public static class DataTypes
             public const string Sample = "dna"; // DNA samples
             public const string Sm = "dna-sm"; // SMs
             public const string Cnv = "dna-cnv"; // CNVs
+            public const string CnvProfile = "dna-cnvp"; // CNVs
             public const string Sv = "dna-sv"; // SVs
         }
 
