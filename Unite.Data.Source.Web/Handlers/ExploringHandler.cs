@@ -273,6 +273,7 @@ public class ExploringHandler
         {
             DataTypes.Omics.Dna.Sm => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Dna.Sm}?review={review}",
             DataTypes.Omics.Dna.Cnv => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Dna.Cnv}?review={review}",
+            DataTypes.Omics.Dna.CnvProfile => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Dna.CnvProfile}?review={review}",
             DataTypes.Omics.Dna.Sv => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Dna.Sv}?review={review}",
             DataTypes.Omics.Meth.Level => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Meth.Level}?review={review}",
             DataTypes.Omics.Rna.Exp => $"{_feedOptions.OmicsHost}/{DataUrls.Omics.Rna.Exp}?review={review}",
