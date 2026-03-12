@@ -91,10 +91,17 @@ public class ExploringHandler
         foreach (var file in files)
         {
             var pathRelative = Path.Combine(folderConfig.Path, file.Path);
-            var pathAbsolute = Path.Combine(_configOptions.DataPath, pathRelative);
+            var pathAbsolute = Path.GetFullPath(Path.Combine(_configOptions.DataPath, pathRelative));
 
             if (_foundFilesCache.Contains(pathRelative) || _errorFilesCache.Contains(pathRelative))
                 continue;
+
+            if (!ValidateFilePath(folderConfig.Path, file.Path))
+            {
+                _logger.LogError("File path '{filePath}' goes beyond config path '{configPath}' for data type '{dataType}'.", file.Path, folderConfig.Path, type);
+                _errorFilesCache.Add(pathRelative);
+                continue;
+            }
 
             //TODO: It would be better to use field 'ResourceType' instead of 'Reader' as an additional config field
             if (string.IsNullOrWhiteSpace(file.Reader)) // File is a resource
@@ -137,8 +144,7 @@ public class ExploringHandler
         }
     }
     
-    private async Task FeedFileAsCustomResource(ConfigEntry folderConfig, string type, ResultFile file, string pathAbsolute,
-        string pathRelative)
+    private async Task FeedFileAsCustomResource(ConfigEntry folderConfig, string type, ResultFile file, string pathAbsolute, string pathRelative)
     {
         var readerPath = Path.Combine(_configOptions.ConfigPath, folderConfig.Crawler, "readers", file.Reader[4..]);
 
@@ -189,10 +195,17 @@ public class ExploringHandler
         foreach (var file in files)
         {
             var pathRelative = Path.Combine(folderConfig.Path, file.Path);
-            var pathAbsolute = Path.Combine(_configOptions.DataPath, pathRelative);
+            var pathAbsolute = Path.GetFullPath(Path.Combine(_configOptions.DataPath, pathRelative));
 
             if (_foundFilesCache.Contains(pathRelative) || _errorFilesCache.Contains(pathRelative))
                 continue;
+
+            if (!ValidateFilePath(folderConfig.Path, file.Path))
+            {
+                _logger.LogError("File path '{filePath}' goes beyond config path '{configPath}' for data type '{dataType}'.", file.Path, folderConfig.Path, type);
+                _errorFilesCache.Add(pathRelative);
+                continue;
+            }
 
             var key = Guid.NewGuid().ToString();
             var url = $"{_workerOptions.Host}/api/file/{key}";
@@ -301,11 +314,13 @@ public class ExploringHandler
         }
     }
 
-    private static string GetPath(string dataPath, string filePath)
+    private static bool ValidateFilePath(string configPath, string filePath)
     {
-        if (string.IsNullOrWhiteSpace(dataPath))
-            return filePath;
-
-        return filePath[dataPath.Length..];
+        // File path is relative to config path.
+        // We need to make sure, that file path starting with '../' does not go beyond config path.
+        var configParts = configPath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        var fileParts = filePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        var relativeBlocksCount = fileParts.TakeWhile(part => part == "..").Count();
+        return relativeBlocksCount <= configParts.Length;
     }
 }
