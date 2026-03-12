@@ -49,6 +49,6 @@ public class FileController : Controller
         if (string.IsNullOrWhiteSpace(dataPath))
             return filePath;
         
-        return Path.Combine(dataPath, filePath);
+        return Path.GetFullPath(Path.Combine(dataPath, filePath));
     }
 }
