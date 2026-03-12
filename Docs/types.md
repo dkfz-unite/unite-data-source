@@ -24,6 +24,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `format`__*__ - File format (`fasta`, `fastq`, `bam`, `bam.bai`, `bam.bai.md5`).
 - `path`__*__ - Path to the file.
 
@@ -56,6 +57,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `reader` - File reaeder / data format (`tsv`, `vcf` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
@@ -90,6 +92,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `purity` - Estimated sample purity, if available (e.g. `0.8` for 80%).
 - `ploidy` - Estimated sample ploidy, if available (e.g. `2` for diploid, used by default).
 - `reader` - File reader / data format (`tsv`, `aceseq` or custom `cmd/{name}`).
@@ -123,6 +126,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `reader` - File reader / data format (`tsv`, `dkfz-sophia` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
@@ -154,6 +158,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `format`__*__ - Sample file format (`idat`, `fasta`, `fastq`, `bam`, `bam.bai`, `bam.bai.md5`).
 - `path`__*__ - Path to the file.
 
@@ -186,6 +191,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `format`__*__ - Sample file format (`fasta`, `fastq`, `bam`, `bam.bai`, `bam.bai.md5`).
 - `path`__*__ - Path to the file.
 
@@ -214,6 +220,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `reader` - File reader / data format (`tsv`, `dkfz-rnaseq` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
@@ -245,6 +252,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `format`__*__ - Sample file format (`fasta`, `fastq`, `bam`, `bam.bai`, `bam.bai.md5`).
 - `path`__*__ - Path to the file.
 
@@ -272,6 +280,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `cells` - Number of cells.
 - `format`__*__ - Resource file format (`mtx`, `tsv`).
 - `path`__*__ - Path to the file.
@@ -306,6 +315,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `format`__*__ - Sample file format (`mzML`, `mzXML`).
 - `path`__*__ - Path to the file.
 
@@ -334,6 +344,7 @@ Metadata:
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `reader` - File reader / data format (`tsv`, `diann` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
