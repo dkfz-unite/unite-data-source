@@ -12,6 +12,7 @@ public class SampleFile
     public const string AnalysisDateColumn = "analysis_date";
     public const string AnalysisDayColumn = "analysis_day";
     public const string GenomeColumn = "genome";
+    public const string BatchColumn = "batch";
     public const string FormatColumn = "format";
     public const string PathColumn = "path";
     public const string ResourcesColumn = "resources";
@@ -38,6 +39,9 @@ public class SampleFile
     [Column(GenomeColumn)]
     public string Genome { get; set; }
 
+    [Column(BatchColumn)]
+    public string Batch { get; set; }
+
     [Column(FormatColumn)]
     public string Format { get; set; }
 
@@ -54,12 +58,13 @@ public class SampleFile
                AnalysisType == file.AnalysisType &&
                AnalysisDate == file.AnalysisDate &&
                AnalysisDay == file.AnalysisDay &&
-               Genome == file.Genome;
+               Genome == file.Genome &&
+               Batch == file.Batch;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(DonorId, SpecimenId, SpecimenType, AnalysisType, AnalysisDate, AnalysisDay, Genome);
+        return HashCode.Combine(DonorId, SpecimenId, SpecimenType, AnalysisType, AnalysisDate, AnalysisDay, Genome, Batch);
     }
 
     public MultipartFormDataContent AsForm()
@@ -72,6 +77,7 @@ public class SampleFile
             .AddField(AnalysisDateColumn, AnalysisDate)
             .AddField(AnalysisDayColumn, AnalysisDay)
             .AddField(GenomeColumn, Genome)
+            .AddField(BatchColumn, Batch)
             .AddField(FormatColumn, Format);
     }
 
