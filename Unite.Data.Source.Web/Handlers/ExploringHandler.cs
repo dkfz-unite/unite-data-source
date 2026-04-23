@@ -429,8 +429,8 @@ public class ExploringHandler
         string[] types = [
             DataTypes.Omics.Dna.Sm,
             DataTypes.Omics.Dna.Cnv,
+            DataTypes.Omics.Dna.CnvProfile,
             DataTypes.Omics.Dna.Sv,
-            DataTypes.Omics.Dna.Cnvp,
             DataTypes.Omics.Meth.Level,
             DataTypes.Omics.Rna.Exp,
             DataTypes.Omics.Rnasc.Exp,
