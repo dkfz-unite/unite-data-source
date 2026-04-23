@@ -60,27 +60,58 @@ public class ExploringHandler
     private async Task HandleConfigEntry(ConfigEntry folderConfig)
     {
         foreach (var type in folderConfig.Types)
-        {                
-            var tsv = await LoadTsvSheet(folderConfig, type);
+        {
+            if (IsDataType(type))
+            {
+                await HandleDataFile(folderConfig, null, type);
+            }
+            else
+            {
+                var tsv = await LoadTsvSheet(folderConfig, type);
 
-            if (string.IsNullOrWhiteSpace(tsv))
-            {
-                _logger.LogWarning("Sheet content is empty for type '{type}'", type);
-                continue;
-            }
-            
-            //TODO: not a clear way to distinguish between different resource types(use more explicit way to describe a file type, better not '-' symbol)
-            if (type.Contains('-')) // Result file
-            {
-                await HandleResultFile(folderConfig, tsv, type);
-            }
-            else // Sample file
-            {
-                await HandleSampleFile(folderConfig, tsv, type);
+                if (!string.IsNullOrWhiteSpace(tsv))
+                {
+                    if (IsSampleType(type))
+                        await HandleSampleFile(folderConfig, tsv, type);
+                    else if (IsResultType(type))
+                        await HandleResultFile(folderConfig, tsv, type);
+                    else
+                        _logger.LogWarning("Unknown data type '{type}'", type);
+                }
+                else
+                {
+                    _logger.LogWarning("No sheet content for type '{type}'", type);
+                }
             }
         }
     }
     
+    private async Task HandleDataFile(ConfigEntry folderConfig, string tsv, string type)
+    {
+        var relativePath = Path.Combine(folderConfig.Path, $"{type}.tsv");
+        var absolutePath = Path.GetFullPath(Path.Combine(_configOptions.DataPath, relativePath));
+
+        if (_foundFilesCache.Contains(relativePath) || _errorFilesCache.Contains(relativePath))
+            return;
+
+        if (File.Exists(absolutePath))
+        {
+            try
+            {
+                var content = await File.ReadAllTextAsync(absolutePath);
+                await UploadData(type, content);
+
+                _foundFilesCache.Add(relativePath);
+                _logger.LogInformation("Uploaded file '{path}'", relativePath);
+            }
+            catch (Exception ex)
+            {
+                _errorFilesCache.Add(relativePath);
+                _logger.LogError("Failed to upload file '{path}'\n{message}", relativePath, ex.Message);
+            }
+        }
+    }
+
     private async Task HandleResultFile(ConfigEntry folderConfig, string tsv, string type)
     {
         // TODO: Handle groups
@@ -252,6 +283,43 @@ public class ExploringHandler
         return tsv;
     }
 
+
+    private async Task UploadData(string type, string content, bool review = true)
+    {
+        using var handler = new HttpClientHandler { UseProxy = false };
+        using var client = new HttpClient(handler);
+
+        var url = type switch
+        {
+            DataTypes.Donor.Entry => $"{_feedOptions.DonorsHost}/{DataUrls.Donor.Entry}/tsv?review={review}",
+            DataTypes.Donor.Treatment => $"{_feedOptions.DonorsHost}/{DataUrls.Donor.Treatment}/tsv?review={review}",
+            DataTypes.Image.Entry.Mr => $"{_feedOptions.ImagesHost}/{DataUrls.Image.Entry.Mr}/tsv?review={review}",
+            DataTypes.Image.Entry.Ct => $"{_feedOptions.ImagesHost}/{DataUrls.Image.Entry.Ct}/tsv?review={review}",
+            DataTypes.Specimen.Entry.Material => $"{_feedOptions.SpecimensHost}/{DataUrls.Specimen.Entry.Material}/tsv?review={review}",
+            DataTypes.Specimen.Entry.Line => $"{_feedOptions.SpecimensHost}/{DataUrls.Specimen.Entry.Line}/tsv?review={review}",
+            DataTypes.Specimen.Entry.Organoid => $"{_feedOptions.SpecimensHost}/{DataUrls.Specimen.Entry.Organoid}/tsv?review={review}",
+            DataTypes.Specimen.Entry.Xenograft => $"{_feedOptions.SpecimensHost}/{DataUrls.Specimen.Entry.Xenograft}/tsv?review={review}",
+            DataTypes.Specimen.Intervention => $"{_feedOptions.SpecimensHost}/{DataUrls.Specimen.Intervention}/tsv?review={review}",
+            _ => throw new ArgumentException($"Unknown data type '{type}'")
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Post, url);
+        request.Headers.Add("Authorization", $"Bearer {_workerOptions.Token}");
+        request.Content = new StringContent(content, Encoding.UTF8, "text/tab-separated-values");
+
+        try
+        {
+            var result = await client.SendAsync(request);
+
+            if (!result.IsSuccessStatusCode)
+                throw new Exception($"Uploading to '{url}' resulted in '{result.StatusCode}'\n{result.Content.ReadAsStringAsync().Result}");
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to send request to '{url}'\n{ex.Message}");
+        }
+    }
+
     private async Task UploadSample(string type, MultipartFormDataContent form, bool review = true)
     {
         using var handler = new HttpClientHandler { UseProxy = false };
@@ -306,7 +374,7 @@ public class ExploringHandler
             var result = await client.SendAsync(request);
 
             if (!result.IsSuccessStatusCode)
-            throw new Exception($"Uploading to '{url}' resulted in '{result.StatusCode}'\n{result.Content.ReadAsStringAsync().Result}");
+                throw new Exception($"Uploading to '{url}' resulted in '{result.StatusCode}'\n{result.Content.ReadAsStringAsync().Result}");
         }
         catch (Exception ex)
         {
@@ -322,5 +390,51 @@ public class ExploringHandler
         var fileParts = filePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         var relativeBlocksCount = fileParts.TakeWhile(part => part == "..").Count();
         return relativeBlocksCount <= configParts.Length;
+    }
+
+
+    private static bool IsDataType(string type)
+    {
+        string[] types = [
+            DataTypes.Donor.Entry,
+            DataTypes.Donor.Treatment,
+            DataTypes.Image.Entry.Mr,
+            DataTypes.Image.Entry.Ct,
+            DataTypes.Specimen.Entry.Material,
+            DataTypes.Specimen.Entry.Line,
+            DataTypes.Specimen.Entry.Organoid,
+            DataTypes.Specimen.Entry.Xenograft,
+            DataTypes.Specimen.Intervention
+        ];
+
+        return types.Contains(type);
+    }
+
+    private static bool IsSampleType(string type)
+    {
+        string[] types = [
+            DataTypes.Omics.Dna.Sample,
+            DataTypes.Omics.Meth.Sample,
+            DataTypes.Omics.Rna.Sample,
+            DataTypes.Omics.Rnasc.Sample,
+            DataTypes.Omics.Prot.Sample
+        ];
+
+        return types.Contains(type);
+    }
+
+    private static bool IsResultType(string type)
+    {
+        string[] types = [
+            DataTypes.Omics.Dna.Sm,
+            DataTypes.Omics.Dna.Cnv,
+            DataTypes.Omics.Dna.Sv,
+            DataTypes.Omics.Meth.Level,
+            DataTypes.Omics.Rna.Exp,
+            DataTypes.Omics.Rnasc.Exp,
+            DataTypes.Omics.Prot.Exp
+        ];
+
+        return types.Contains(type);
     }
 }
