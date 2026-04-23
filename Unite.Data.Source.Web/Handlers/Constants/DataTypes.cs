@@ -17,6 +17,7 @@ public static class DataTypes
     // dna-sm
     // dna-cnv
     // dna-sv
+    // dna-cnvp
     // meth
     // meth-lvl
     // rna
@@ -66,6 +67,7 @@ public static class DataTypes
             public const string Cnv = "dna-cnv"; // CNVs
             public const string CnvProfile = "dna-cnvp"; // CNVs
             public const string Sv = "dna-sv"; // SVs
+            public const string Cnvp = "dna-cnvp"; // CNV profiles
         }
 
         public static class Meth
