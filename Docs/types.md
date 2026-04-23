@@ -7,6 +7,81 @@ Types have two subtypes:
 - **Resource** - Data is not read, such files are hosted by the Data Source Service as resources and only their metadata (with access url) is sent to the UNITE portal.  
                  Such data is integrated only metadata wise, the portal will know it exists and will be able to access it via the generated url for the analysis purposes.
 
+## Donors
+Donors entries metadata and clinical data, donor treatments.
+
+### Entries
+Donors metadata and clinical data.
+
+Key: `don`.  
+Sheet file name: `don.tsv`.  
+Subtype: `data`.
+
+Available metadata fields and their description as well as example file are available [here](https://github.com/dkfz-unite/unite-feed-donors/blob/main/Docs/api.md#tsv---texttab-separated-values).
+
+### Treatments
+Donor treatments.
+
+key: `don-trt`.  
+Sheet file name: `don-trt.tsv`.  
+Subtype: `data`.
+
+Available metadata fields and their description as well as example file are available [here](https://github.com/dkfz-unite/unite-feed-donors/blob/main/Docs/api.md#tsv---texttab-separated-values-1).
+
+
+## Images
+Radiology images (MR, CT) and derived radiomics features.
+
+### MR
+MR images metadata.
+
+Key: `mr`.  
+Sheet file name: `mr.tsv`.  
+Subtype: `data`.
+
+Available metadata fields and their description as well as example file are available [here](https://github.com/dkfz-unite/unite-feed-images/blob/main/Docs/api.md#tsv---texttab-separated-values).
+
+
+## Specimens
+Specimens metadata and interventions data.
+
+### Materials
+Donor derived materials (e.g. tissue or blood) metadata.
+
+key: `mat`.  
+Sheet file name: `mat.tsv`.  
+Subtype: `data`.
+
+Available metadata fields and their description as well as example file are available [here](https://github.com/dkfz-unite/unite-feed-specimens/blob/main/Docs/api-models-material.md).
+
+### Cell Lines
+Cell lines metadata.
+
+Key: `lne`.  
+Sheet file name: `lne.tsv`.  
+Subtype: `data`.
+
+Available metadata fields and their description as well as example file are available [here](https://github.com/dkfz-unite/unite-feed-specimens/blob/main/Docs/api-models-line.md).
+
+### Organoids
+Organoids metadata.
+
+Key: `org`.  
+Sheet file name: `org.tsv`.  
+Subtype: `data`.
+
+Available metadata fields and their description as well as example file are available [here](https://github.com/dkfz-unite/unite-feed-specimens/blob/main/Docs/api-models-organoid.md).
+
+### Xenografts
+Xenografts metadata.
+
+Key: `xen`.  
+Sheet file name: `xen.tsv`.  
+Subtype: `data`.
+
+Available metadata fields and their description as well as example file are available [here](https://github.com/dkfz-unite/unite-feed-specimens/blob/main/Docs/api-models-xenograft.md).
+
+
 ## DNA
 
 ### Sample
