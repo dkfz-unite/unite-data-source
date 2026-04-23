@@ -40,9 +40,8 @@ public static class DataUrls
             public const string Sample = $"dna/sample"; // DNA samples
             public const string Sm = $"dna/analysis/sm"; // SMs
             public const string Cnv = $"dna/analysis/cnv"; // CNVs
-            public const string CnvProfile = $"dna/analysis/cnv-profile"; // CNVPs
+            public const string CnvProfile = $"dna/analysis/cnvp"; // CNVPs
             public const string Sv = $"dna/analysis/sv"; // SVs
-            public const string Cnvp = $"dna/analysis/cnvp"; // CNVPs
         }
 
         public static class Meth
