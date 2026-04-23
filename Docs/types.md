@@ -200,6 +200,8 @@ Metadata:
 - `analysis_type`__*__ - Sample analysis (sequencing) type (`WES`, `WGS`, `MethArray`).
 - `analysis_date` - Sample analysis (sequencing) date in ISO format (`yyyy-MM-dd`).
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
+- `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
+- `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
 - `reader` - File reader / data format (`tsv`).
 - `path`__*__ - Path to the file.
 
