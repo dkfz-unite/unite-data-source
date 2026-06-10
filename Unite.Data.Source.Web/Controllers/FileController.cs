@@ -10,11 +10,13 @@ public class FileController : Controller
 {
     protected readonly ConfigOptions _configOptions;
     protected readonly HostFilesCache _filesCache;
+    private readonly ILogger<FileController> _logger;
 
 
-    public FileController(ConfigOptions configOptions)
+    public FileController(ConfigOptions configOptions, ILogger<FileController> logger)
     {
         _configOptions = configOptions;
+        _logger = logger;
         _filesCache = new HostFilesCache(Path.Combine(_configOptions.CachePath, "host-files.tsv"));
     }
 
@@ -31,12 +33,21 @@ public class FileController : Controller
     {
         if (System.IO.File.Exists(path))
         {
-            var stream = new StreamReader(path).BaseStream;
+            try
+            {
+                var stream = new StreamReader(path).BaseStream;
 
-            return File(stream, "application/octet-stream", enableRangeProcessing: true);
+                return File(stream, "application/octet-stream", enableRangeProcessing: true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error reading file: {Path}", path);
+                return StatusCode(500, "Internal server error");
+            }
         }
         else
         {
+            _logger.LogWarning("File not found: {Path}", path);
             return NotFound();
         }
     }
