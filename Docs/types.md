@@ -136,7 +136,7 @@ Metadata:
 - `reader` - File reaeder / data format (`tsv`, `vcf` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
-More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-dna-sm.md#formats).
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/main/Docs/models-dna-sm.md#formats).
 
 #### Example
 `/mnt/data/project/dna-sm.tsv`
@@ -173,7 +173,7 @@ Metadata:
 - `reader` - File reader / data format (`tsv`, `aceseq` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
-More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-dna-cnv.md#formats).
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/main/Docs/models-dna-cnv.md#formats).
 
 #### Example
 `/mnt/data/project/dna-cnv.tsv`
@@ -205,7 +205,7 @@ Metadata:
 - `reader` - File reader / data format (`tsv`).
 - `path`__*__ - Path to the file.
 
-More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-dna-cnvp.md#formats).
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/main/Docs/models-dna-cnvp.md#formats).
 
 #### Example
 `/mnt/data/project/dna-cnvp.tsv`
@@ -237,7 +237,7 @@ Metadata:
 - `reader` - File reader / data format (`tsv`, `dkfz-sophia` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
-More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-dna-sv.md#formats).
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/main/Docs/models-dna-sv.md#formats).
 
 #### Example
 `/mnt/data/project/dna-sv.tsv`
@@ -331,7 +331,7 @@ Metadata:
 - `reader` - File reader / data format (`tsv`, `dkfz-rnaseq` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
-More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-rna-exp.md#formats).
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/main/Docs/models-rna-exp.md#formats).
 
 #### Example
 `/mnt/data/project/rna-exp.tsv`
@@ -455,7 +455,7 @@ Metadata:
 - `reader` - File reader / data format (`tsv`, `diann` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
 
-More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/Docs/models-prot-exp.md#formats).
+More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/main/Docs/models-prot-exp.md#formats).
 
 #### Example
 `/mnt/data/project/prot-exp.tsv`
