@@ -423,7 +423,7 @@ Metadata:
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
 - `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
-- `format`__*__ - Sample file format (`mzML`, `mzXML`).
+- `format`__*__ - Sample file format (`mzml`). Only the open mzML format is supported; convert vendor-specific raw files (e.g. Thermo `.raw`, Bruker `.d`) to mzML first.
 - `path`__*__ - Path to the file.
 
 
@@ -431,9 +431,9 @@ Metadata:
 `/mnt/data/project/prot.tsv`
 ```tsv
 donor_id	specimen_id	specimen_type	analysis_type	analysis_date	genome	format	path
-Donor1    Tumor    Material	MS    2023-01-01    GRCh37    bam    omics/MS/Donor1/tumor.mzML
-Donor2    Tumor    Material	MS    2023-01-02    GRCh37    bam    omics/MS/Donor2/tumor.mzXML
-Donor3    Tumor    Material	MS    2023-01-03    GRCh37    bam    omics/MS/Donor3/tumor.mzML
+Donor1    Tumor    Material	MS    2023-01-01    GRCh37    mzml    omics/MS/Donor1/tumor.mzML
+Donor2    Tumor    Material	MS    2023-01-02    GRCh37    mzml    omics/MS/Donor2/tumor.mzML
+Donor3    Tumor    Material	MS    2023-01-03    GRCh37    mzml    omics/MS/Donor3/tumor.mzML
 ```
 
 ### Expressions
