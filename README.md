@@ -1,5 +1,8 @@
 # Data Source Service
 
+Shared architecture, development workflows, and agent instructions:
+[UNITE project documentation](https://github.com/dkfz-unite/.github/blob/main/README.md).
+
 ## General
 Data source service provides the following functionality:
 - Scans configured folders in the file system for the files with data of different types.
