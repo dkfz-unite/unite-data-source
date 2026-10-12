@@ -27,14 +27,14 @@ To configure the application, change environment variables in either docker or [
 - `UNITE_WORKER_TOKEN` - UNITE worker JWT token to access the portal.
 - `UNITE_PORTAL_HOST` - Public url of the portal service (`https://portal.unite.net`).  
     This parameter will be used, if custom feed services are not set.
-- `UNITE_DONORS_FEED_HOST` - Public url of the donors feed service (`https://portal.unite.net/api/donors-feed`).  
-    This parameter is and optional, if `UNITE_PORTAL_HOST` is set.
-- `UNITE_IMAGES_FEED_HOST` - Public url of the images feed service (`https://portal.unite.net/api/images-feed`).  
-    This parameter is and optional, if `UNITE_PORTAL_HOST` is set.
-- `UNITE_SPECIMENS_FEED_HOST` - Public url of the specimens feed service (`https://portal.unite.net/api/specimens-feed`).  
-    This parameter is and optional, if `UNITE_PORTAL_HOST` is set.
-- `UNITE_OMICS_FEED_HOST` - Public url of the omics feed service (`https://portal.unite.net/api/omics-feed`).  
-    This parameter is and optional, if `UNITE_PORTAL_HOST` is set.
+- `UNITE_FEED_DONORS_HOST` - Public url of the donors feed service (`https://portal.unite.net/api/feed-donors`).  
+    Optional if `UNITE_PORTAL_HOST` is set; defaults to `<UNITE_PORTAL_HOST>/api/feed-<type>`.
+- `UNITE_FEED_IMAGES_HOST` - Public url of the images feed service (`https://portal.unite.net/api/feed-images`).  
+    Optional if `UNITE_PORTAL_HOST` is set; defaults to `<UNITE_PORTAL_HOST>/api/feed-<type>`.
+- `UNITE_FEED_SPECIMENS_HOST` - Public url of the specimens feed service (`https://portal.unite.net/api/feed-specimens`).  
+    Optional if `UNITE_PORTAL_HOST` is set; defaults to `<UNITE_PORTAL_HOST>/api/feed-<type>`.
+- `UNITE_FEED_OMICS_HOST` - Public url of the omics feed service (`https://portal.unite.net/api/feed-omics`).  
+    Optional if `UNITE_PORTAL_HOST` is set; defaults to `<UNITE_PORTAL_HOST>/api/feed-<type>`.
 - `UNITE_CONFIG_PATH` - Path to the configuration folder (`./config`).
 - `UNITE_CACHE_PATH` - Path to the cache folder (`./cache`).
 - `UNITE_DATA_PATH` - Path to the data folder (`/data`).  
