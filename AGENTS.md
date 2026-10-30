@@ -42,6 +42,7 @@ One project, `Unite.Data.Source.Web`:
 | `Handlers/ExploringHandler.cs` | Reads `config.tsv` per pass, routes each type (direct TSV data, sample sheets, result sheets), runs crawlers and custom readers, uploads to the feeds, maintains the caches |
 | `Handlers/Constants/DataTypes.cs`, `DataUrls.cs` | Data type keys (e.g. `dna-sm`) and feed routes per type |
 | `Handlers/Contract/` | Sheet row models (`SampleFile`, `ResultFile`, `Resource`) and form building |
+| `Handlers/Contract/GroupKeyAttribute.cs`, `GroupKeyComparer.cs` | Declarative submission metadata used to group resource rows; mark shared fields with `[GroupKey]`, excluding file paths and formats |
 | `Handlers/*FilesCache.cs` | `found-files.tsv`, `error-files.tsv`, `host-files.tsv` in `UNITE_CACHE_PATH` |
 | `Controllers/FileController.cs` | `GET api/file/{key}`: serves a hosted file by resource key, with range requests |
 | `Configuration/Options/` | Paths, portal and feed hosts, worker host and token |
@@ -74,11 +75,13 @@ dotnet run --project Unite.Data.Source.Web --launch-profile Unite.Data.Source.We
 - **Types without support yet**: radiomics (`img-rad`) and drug screenings
   (`spe-drg`) are defined but not routed (Jira UND-1077). CT (`ct`) is routed,
   but CT is a planned future type and the images feed has no CT endpoint yet.
-- **Caches** are keyed by relative path only: a path in the found or error
-  cache is never processed again until its line is removed. Changing a file
-  does not trigger a new upload. Sample and result sheets are re-read every
-  pass and each listed file is cached individually; direct data sheets (donors,
-  treatments, specimens, interventions) are cached as a whole. Resubmission is
+- **Caches** are keyed by relative path only. Changing a file does not trigger
+  a new upload. Sample and result sheets are re-read every pass and each listed
+  file is cached individually. Resource groups are skipped when every member
+  is uploaded or any member has an error; otherwise the entire group is sent,
+  reusing hosted URLs. See [Resource grouping](Docs/types.md#resource-grouping).
+  Entry files are skipped individually when found or failed; direct data sheets
+  (donors, treatments, specimens, interventions) are cached as a whole. Resubmission is
   done manually by an administrator, which is intended for now (owner,
   2026-10-12); change detection for data sheets and a management UI (portal
   plugin) are planned (Jira UND-1078, UND-1079).

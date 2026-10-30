@@ -7,6 +7,47 @@ Types have two subtypes:
 - **Resource** - Data is not read, such files are hosted by the Data Source Service as resources and only their metadata (with access url) is sent to the UNITE portal.  
                  Such data is integrated only metadata wise, the portal will know it exists and will be able to access it via the generated url for the analysis purposes.
 
+## OMICS result replacement
+
+Each result-sheet row with a reader is submitted separately. After approval and processing,
+SM entries replace the target sample's mutations within `entries_scope` (see
+[Simple Mutations](#simple-mutations)). An omitted or empty scope replaces all
+SM types. CNV, SV, CNV profiles, bulk RNA expressions and protein expressions
+always replace the target sample's entire result set of that kind. Keep those
+results in one file per sample and result kind; splitting them across rows
+does not merge them. Other result kinds and other samples are preserved.
+
+These data uploads require a nonempty entries file. Resource-only uploads,
+such as single-cell expression files, register file metadata and URLs instead.
+Sample metadata and resources continue to be added or updated.
+Leave `entries_scope` empty for all result kinds except SM.
+
+The `analysis_type`, `analysis_date` and `analysis_day` columns describe the
+sample's primary assay; their names remain unchanged. A matched specimen in a
+result row uses the same assay type and genome as the target. Submit its
+sample separately to provide its own assay date or other metadata.
+
+## Resource grouping
+
+Within each sheet and data type, resource rows with identical submission
+metadata are sent in one request containing a single `resources.tsv` with all
+their file records. This applies to sample sheets and result rows without a
+reader. For example, red/green IDAT files, the matrix/features/barcodes files
+of a single-cell sample, or a BAM and its index can share one submission.
+
+Matching metadata means the same donor, specimen ID/type, assay type/date/day,
+genome and batch. Result sheets additionally compare matched specimen ID/type,
+purity, ploidy, cells and entries scope. Paths and file formats do not affect
+grouping; every resource keeps its own name, format and URL. Different metadata
+produces separate submissions. Data files with readers, including SM files,
+remain separate uploads.
+
+The entire group is marked uploaded only after the request succeeds. A failed
+request records all group members in the error cache. Clear those entries
+before retrying. When a group needs resubmission, all its listed resources are
+included and previously hosted URLs are reused. Grouping does not enforce a
+particular file bundle; the feed validates the submitted resources.
+
 ## Donors
 Donors entries metadata and clinical data, donor treatments.
 
@@ -116,7 +157,7 @@ Donor1    Tumor    Material	WGS    2023-01-01    GRCh37    bam.bai.md5    omics/
 ```
 
 ### Simple Mutations
-Simple mutations data, which is a result of the mutations (SNV, INDEL) calling pipeline.
+Simple mutations data from SNV, insertion, deletion and MNV calling pipelines.
 
 Key: `dna-sm`.  
 Sheet file name: `dna-sm.tsv`.  
@@ -133,21 +174,32 @@ Metadata:
 - `analysis_day` - Sample analysis (sequencing) day, relative to enrollment date, in days.
 - `genome`__*__ - Sample genome version (`GRCh37` or `GRCh38`).
 - `batch` - Batch identifier, if available, for grouping samples that were processed together (e.g. `Batch1`).
-- `reader` - File reaeder / data format (`tsv`, `vcf` or custom `cmd/{name}`).
+- `entries_scope` - Optional comma-separated mutation types completely covered by this file: `SNV`, `INS`, `DEL`, `MNV`. For an INDEL caller, use `INS, DEL`. Omitted or empty means all SM types.
+- `reader` - File reader / data format (`tsv`, `vcf` or custom `cmd/{name}`).
 - `path`__*__ - Path to the file.
+
+Every entry must belong to a declared type, otherwise the feed rejects the
+request. All previous entries of the declared types are replaced, including
+types with no new entries in a nonempty file. Other SM types are preserved.
+Scope is supplied explicitly; it is not inferred from the filename or content.
+For separate SNV and INDEL files, set `SNV` and `INS, DEL` respectively as shown
+below. Separate insertion and deletion callers can use `INS` and `DEL`.
+
+Data Source sends the scope as one comma-separated multipart field. Custom
+crawlers use the same optional column in their output sheets.
 
 More information about supported formats is available [here](https://github.com/dkfz-unite/unite-feed-omics/blob/main/Docs/models-dna-sm.md#formats).
 
 #### Example
 `/mnt/data/project/dna-sm.tsv`
 ```tsv
-donor_id	specimen_id	specimen_type	matched_specimen_id	matched_specimen_type    analysis_type	analysis_date	genome	reader	path
-Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    tsv    omics/WGS/Donor1/snv.tsv
-Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    tsv    omics/WGS/Donor1/indel.tsv
-Donor2    Tumor    Material    Normal    Material    WGS    2023-01-02    GRCh37    vcf    omics/WGS/Donor2/snv.vcf
-Donor2    Tumor    Material    Normal    Material    WGS    2023-01-02    GRCh37    vcf    omics/WGS/Donor2/indel.vcf
-Donor3    Tumor    Material    Normal    Material    WGS    2023-01-03    GRCh37    cmd/dna-sm   omics/WGS/Donor3/snv.tsv
-Donor3    Tumor    Material    Normal    Material    WGS    2023-01-03    GRCh37    cmd/dna-sm   omics/WGS/Donor3/indel.tsv
+donor_id	specimen_id	specimen_type	matched_specimen_id	matched_specimen_type	analysis_type	analysis_date	genome	entries_scope	reader	path
+Donor1	Tumor	Material	Normal	Material	WGS	2023-01-01	GRCh37	SNV	tsv	omics/WGS/Donor1/snv.tsv
+Donor1	Tumor	Material	Normal	Material	WGS	2023-01-01	GRCh37	INS, DEL	tsv	omics/WGS/Donor1/indel.tsv
+Donor2	Tumor	Material	Normal	Material	WGS	2023-01-02	GRCh37	SNV	vcf	omics/WGS/Donor2/snv.vcf
+Donor2	Tumor	Material	Normal	Material	WGS	2023-01-02	GRCh37	INS, DEL	vcf	omics/WGS/Donor2/indel.vcf
+Donor3	Tumor	Material	Normal	Material	WGS	2023-01-03	GRCh37	SNV	cmd/dna-sm	omics/WGS/Donor3/snv.tsv
+Donor3	Tumor	Material	Normal	Material	WGS	2023-01-03	GRCh37	INS, DEL	cmd/dna-sm	omics/WGS/Donor3/indel.tsv
 ```
 
 ### Copy Number Variants

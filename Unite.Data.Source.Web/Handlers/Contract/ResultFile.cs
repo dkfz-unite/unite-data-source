@@ -3,7 +3,7 @@ using Unite.Essentials.Tsv.Attributes;
 
 namespace Unite.Data.Source.Web.Handlers.Contract;
 
-public class ResultFile
+public record ResultFile : IResourceFile
 {
     public const string DonorIdColumn = "donor_id";
     public const string SpecimenIdColumn = "specimen_id";
@@ -23,46 +23,64 @@ public class ResultFile
     public const string PathColumn = "path";
     public const string ResourcesColumn = "resources";
     public const string EntriesColumn = "entries";
+    public const string EntriesScopeColumn = "entries_scope";
 
 
+    [GroupKey]
     [Column(DonorIdColumn)]
     public string DonorId { get; set; }
 
+    [GroupKey]
     [Column(SpecimenIdColumn)]
     public string SpecimenId { get; set; }
 
+    [GroupKey]
     [Column(SpecimenTypeColumn)]
     public string SpecimenType { get; set; }
 
+    [GroupKey]
     [Column(MatchedSpecimenIdColumn)]
     public string MatchedSpecimenId { get; set; }
 
+    [GroupKey]
     [Column(MatchedSpecimenTypeColumn)]
     public string MatchedSpecimenType { get; set; }
 
+    [GroupKey]
     [Column(AnalysisTypeColumn)]
     public string AnalysisType { get; set; }
 
+    [GroupKey]
     [Column(AnalysisDateColumn)]
     public string AnalysisDate { get; set; }
 
+    [GroupKey]
     [Column(AnalysisDayColumn)]
     public string AnalysisDay { get; set; }
 
+    [GroupKey]
     [Column(PurityColumn)]
     public string Purity { get; set; }
 
+    [GroupKey]
     [Column(PloidyColumn)]
     public string Ploidy { get; set; }
 
+    [GroupKey]
     [Column(CellsColumn)]
     public string Cells { get; set; }
 
+    [GroupKey]
     [Column(GenomeColumn)]
     public string Genome { get; set; }
 
+    [GroupKey]
     [Column(BatchColumn)]
     public string Batch { get; set; }
+
+    [GroupKey]
+    [Column(EntriesScopeColumn)]
+    public string EntriesScope { get; set; }
 
     [Column(FormatColumn)]
     public string Format { get; set; }
@@ -72,32 +90,6 @@ public class ResultFile
 
     [Column(PathColumn)]
     public string Path { get; set; }
-
-
-    public override bool Equals(object obj)
-    {
-        return obj is ResultFile file &&
-               DonorId == file.DonorId &&
-               SpecimenId == file.SpecimenId &&
-               SpecimenType == file.SpecimenType &&
-               MatchedSpecimenId == file.MatchedSpecimenId &&
-               MatchedSpecimenType == file.MatchedSpecimenType &&
-               AnalysisType == file.AnalysisType &&
-               AnalysisDate == file.AnalysisDate &&
-               AnalysisDay == file.AnalysisDay &&
-               Purity == file.Purity &&
-               Ploidy == file.Ploidy &&
-               Cells == file.Cells &&
-               Genome == file.Genome &&
-               Batch == file.Batch;
-    }
-
-    public override int GetHashCode()
-    {
-        var part1 = HashCode.Combine(DonorId, SpecimenId, SpecimenType, AnalysisType, AnalysisDate, AnalysisDay, Genome, Batch);
-        var part2 = HashCode.Combine(MatchedSpecimenId, MatchedSpecimenType, Purity, Ploidy, Cells);
-        return HashCode.Combine(part1, part2);
-    }
 
 
     public MultipartFormDataContent AsForm()
@@ -115,7 +107,8 @@ public class ResultFile
             .AddField(PloidyColumn, Ploidy)
             .AddField(CellsColumn, Cells)
             .AddField(GenomeColumn, Genome)
-            .AddField(BatchColumn, Batch);
+            .AddField(BatchColumn, Batch)
+            .AddField(EntriesScopeColumn, EntriesScope);
     }
 
     public Resource AsResource(string type, string url)

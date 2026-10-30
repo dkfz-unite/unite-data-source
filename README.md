@@ -63,11 +63,29 @@ The workflow of the service is following:
         - If the file **does not exist**, the service will try to use custom crawler in the configured `crawler` folder.  
           It will expect the application with the name **'crawler'** in the configured `crawler` folder.
     - For each file either from the samples sheet or found by the crawler:
-        - If the file is a resource (`fasta`, `bam`, `idat`, etc.) the service will **host** it and send **only it's metadata** to the Portal.
+        - If the file is a resource (`fasta`, `bam`, `idat`, etc.) the service will **host** it and send **only its metadata** to the Portal. Resource rows with matching submission metadata are sent together (see [Resource grouping](./Docs/types.md#resource-grouping)).
         - If the file is a data file (`snv.vcf`, `indel.vcf`, `cnv.tsv`, etc.), the service will send it to the Portal for further processing and integration.
             - If the format of the file is not supported by the Portal, the service will try to use a custom reader from the file metadata.  
               In this case it will expect the application with the corresponding name in the configured `crawler/readers` folder.
         
+### OMICS result uploads
+
+Result files replace the target sample's existing results of the submitted
+kind after approval and processing. For SM files, the optional `entries_scope`
+column limits replacement to comma-separated types: `SNV`, `INS`, `DEL`, `MNV`.
+Use `SNV` for a separate SNV file and `INS, DEL` for an INDEL file. An omitted
+or empty scope replaces all SM types. Other data result kinds are replaced
+completely; supply one complete file per sample and result kind.
+See [result replacement and sheet fields](./Docs/types.md#omics-result-replacement).
+
+Data files already recorded in `found-files.tsv` or `error-files.tsv` under
+`UNITE_CACHE_PATH` are skipped. Resource groups are skipped when all their files
+are in the found cache or any file is in the error cache. If a group has an
+uncached file, all its resource records are submitted together, reusing existing
+hosted URLs. Editing sheet metadata alone does not trigger an upload. To
+resubmit a resource group, remove at least one member from the found cache and
+clear any error-cache entries for its members. See [Resource grouping](./Docs/types.md#resource-grouping).
+
 ### Custom Crawlers
 Crawler is a custom command line application which locates files of given [type](./Docs/types.md) in given location and returns their metadata and locations as a sample sheet.
 
@@ -81,13 +99,13 @@ The application should output the sample sheet in the format corresponding to th
 
 For example, if the `<type>` is `dna-sm`, the output should be a sample sheet in [corresponding](./Docs/types.md#simple-mutations) format:
 ```tsv
-donor_id	specimen_id	specimen_type	matched_specimen_id	matched_specimen_type    analysis_type	analysis_date	genome	reader	path
-Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    tsv    omics/WGS/Donor1/snv.tsv
-Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    tsv    omics/WGS/Donor1/indel.tsv
-Donor2    Tumor    Material    Normal    Material    WGS    2023-01-02    GRCh37    vcf    omics/WGS/Donor2/snv.vcf
-Donor2    Tumor    Material    Normal    Material    WGS    2023-01-02    GRCh37    vcf    omics/WGS/Donor2/indel.vcf
-Donor3    Tumor    Material    Normal    Material    WGS    2023-01-03    GRCh37    cmd/dna-sm   omics/WGS/Donor3/snv.tsv
-Donor3    Tumor    Material    Normal    Material    WGS    2023-01-03    GRCh37    cmd/dna-sm   omics/WGS/Donor3/indel.tsv
+donor_id	specimen_id	specimen_type	matched_specimen_id	matched_specimen_type	analysis_type	analysis_date	genome	entries_scope	reader	path
+Donor1	Tumor	Material	Normal	Material	WGS	2023-01-01	GRCh37	SNV	tsv	omics/WGS/Donor1/snv.tsv
+Donor1	Tumor	Material	Normal	Material	WGS	2023-01-01	GRCh37	INS, DEL	tsv	omics/WGS/Donor1/indel.tsv
+Donor2	Tumor	Material	Normal	Material	WGS	2023-01-02	GRCh37	SNV	vcf	omics/WGS/Donor2/snv.vcf
+Donor2	Tumor	Material	Normal	Material	WGS	2023-01-02	GRCh37	INS, DEL	vcf	omics/WGS/Donor2/indel.vcf
+Donor3	Tumor	Material	Normal	Material	WGS	2023-01-03	GRCh37	SNV	cmd/dna-sm	omics/WGS/Donor3/snv.tsv
+Donor3	Tumor	Material	Normal	Material	WGS	2023-01-03	GRCh37	INS, DEL	cmd/dna-sm	omics/WGS/Donor3/indel.tsv
 ```
 
 The `path` specified in the sample sheet should be relative to the `<path>` argument passed to the crawler application.
@@ -162,9 +180,9 @@ Donor1    Normal   Material    WGS    2023-01-01    GRCh37    bam   omics/WGS/Do
 
 Content of the `dna-sm.tsv` file:
 ```tsv
-donor_id	specimen_id	specimen_type	matched_specimen_id	matched_specimen_type    analysis_type	analysis_date	genome	reader	path
-Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    vcf    omics/WGS/Donor1/snv.vcf
-Donor1    Tumor    Material    Normal    Material    WGS    2023-01-01    GRCh37    vcf    omics/WGS/Donor1/indel.vcf
+donor_id	specimen_id	specimen_type	matched_specimen_id	matched_specimen_type	analysis_type	analysis_date	genome	entries_scope	reader	path
+Donor1	Tumor	Material	Normal	Material	WGS	2023-01-01	GRCh37	SNV	vcf	omics/WGS/Donor1/snv.vcf
+Donor1	Tumor	Material	Normal	Material	WGS	2023-01-01	GRCh37	INS, DEL	vcf	omics/WGS/Donor1/indel.vcf
 ```
 
 Content of the `dna-cnv.tsv` file:
