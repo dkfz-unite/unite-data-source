@@ -41,6 +41,11 @@ public class HostFilesCache
         return _entries.TryGetValue(key, out var value) ? value : null;
     }
 
+    public string FindKey(string path)
+    {
+        return _entries.FirstOrDefault(entry => entry.Value == path).Key;
+    }
+
     public bool Contains(string key)
     {
         return _entries.ContainsKey(key);
