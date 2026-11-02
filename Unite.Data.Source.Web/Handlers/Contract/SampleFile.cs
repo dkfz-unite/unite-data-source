@@ -3,7 +3,7 @@ using Unite.Essentials.Tsv.Attributes;
 
 namespace Unite.Data.Source.Web.Handlers.Contract;
 
-public class SampleFile
+public record SampleFile : IResourceFile
 {
     public const string DonorIdColumn = "donor_id";
     public const string SpecimenIdColumn = "specimen_id";
@@ -18,27 +18,35 @@ public class SampleFile
     public const string ResourcesColumn = "resources";
 
 
+    [GroupKey]
     [Column(DonorIdColumn)]
     public string DonorId { get; set; }
 
+    [GroupKey]
     [Column(SpecimenIdColumn)]
     public string SpecimenId { get; set; }
 
+    [GroupKey]
     [Column(SpecimenTypeColumn)]
     public string SpecimenType { get; set; }
 
+    [GroupKey]
     [Column(AnalysisTypeColumn)]
     public string AnalysisType { get; set; }
 
+    [GroupKey]
     [Column(AnalysisDateColumn)]
     public string AnalysisDate { get; set; }
 
+    [GroupKey]
     [Column(AnalysisDayColumn)]
     public string AnalysisDay { get; set; }
 
+    [GroupKey]
     [Column(GenomeColumn)]
     public string Genome { get; set; }
 
+    [GroupKey]
     [Column(BatchColumn)]
     public string Batch { get; set; }
 
@@ -48,24 +56,6 @@ public class SampleFile
     [Column(PathColumn)]
     public string Path { get; set; }
 
-
-    public override bool Equals(object obj)
-    {
-        return obj is SampleFile file &&
-               DonorId == file.DonorId &&
-               SpecimenId == file.SpecimenId &&
-               SpecimenType == file.SpecimenType &&
-               AnalysisType == file.AnalysisType &&
-               AnalysisDate == file.AnalysisDate &&
-               AnalysisDay == file.AnalysisDay &&
-               Genome == file.Genome &&
-               Batch == file.Batch;
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(DonorId, SpecimenId, SpecimenType, AnalysisType, AnalysisDate, AnalysisDay, Genome, Batch);
-    }
 
     public MultipartFormDataContent AsForm()
     {
@@ -77,8 +67,7 @@ public class SampleFile
             .AddField(AnalysisDateColumn, AnalysisDate)
             .AddField(AnalysisDayColumn, AnalysisDay)
             .AddField(GenomeColumn, Genome)
-            .AddField(BatchColumn, Batch)
-            .AddField(FormatColumn, Format);
+            .AddField(BatchColumn, Batch);
     }
 
     public Resource AsResource(string type, string url)

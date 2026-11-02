@@ -114,12 +114,15 @@ public class ExploringHandler
 
     private async Task HandleResultFile(ConfigEntry folderConfig, string tsv, string type)
     {
-        // TODO: Handle groups
-        // var groups = files.GroupBy(file => file);
-
         var files = TsvReader.Read<ResultFile>(tsv).ToArray();
-        
-        foreach (var file in files)
+        var resourceGroups = files
+            .Where(file => string.IsNullOrWhiteSpace(file.Reader))
+            .GroupBy(file => file, new GroupKeyComparer<ResultFile>());
+
+        foreach (var group in resourceGroups)
+            await FeedFilesAsResources(folderConfig, type, group.DistinctBy(file => file.Path).ToArray(), form => UploadResult(type, form, null));
+
+        foreach (var file in files.Where(file => !string.IsNullOrWhiteSpace(file.Reader)))
         {
             var pathRelative = Path.Combine(folderConfig.Path, file.Path);
             var pathAbsolute = Path.GetFullPath(Path.Combine(_configOptions.DataPath, pathRelative));
@@ -134,12 +137,7 @@ public class ExploringHandler
                 continue;
             }
 
-            //TODO: It would be better to use field 'ResourceType' instead of 'Reader' as an additional config field
-            if (string.IsNullOrWhiteSpace(file.Reader)) // File is a resource
-            {
-                await FeedFileAsLargeResource(type, file, pathRelative);
-            }
-            else if (file.Reader.StartsWith("cmd/")) // File has custom reader
+            if (file.Reader.StartsWith("cmd/")) // File has custom reader
             {
                 await FeedFileAsCustomResource(folderConfig, type, file, pathAbsolute, pathRelative);
             }
@@ -147,31 +145,6 @@ public class ExploringHandler
             {
                 await FeedFileAsStandardResource(type, file, pathAbsolute, pathRelative);
             }
-        }
-    }
-    
-    private async Task FeedFileAsLargeResource(string type, ResultFile file, string pathRelative)
-    {
-        var key = Guid.NewGuid().ToString();
-        var url = $"{_workerOptions.Host}/api/file/{key}";
-        var resource = file.AsResource(type, url);
-
-        try
-        {
-            var content = TsvWriter.Write([resource]);
-            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-            var form = file.AsForm().AddField(ResultFile.ResourcesColumn, "resources.tsv", stream);
-
-            await UploadResult(type, form, null);
-
-            _hostFilesCache.Add(key, pathRelative);
-            _foundFilesCache.Add(pathRelative);
-            _logger.LogInformation("Uploaded and hosted file '{key}' '{path}'", key, pathRelative);
-        }
-        catch (Exception ex)
-        {
-            _errorFilesCache.Add(pathRelative);
-            _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
         }
     }
     
@@ -218,47 +191,63 @@ public class ExploringHandler
 
     private async Task HandleSampleFile(ConfigEntry folderConfig, string tsv, string type)
     {
-        var files = TsvReader.Read<SampleFile>(tsv).ToArray();
+        var groups = TsvReader.Read<SampleFile>(tsv)
+            .GroupBy(file => file, new GroupKeyComparer<SampleFile>());
 
-        // TODO: Handle groups
-        // var groups = files.GroupBy(file => file);
+        foreach (var group in groups)
+            await FeedFilesAsResources(folderConfig, type, group.DistinctBy(file => file.Path).ToArray(), form => UploadSample(type, form));
+    }
+
+    private async Task FeedFilesAsResources(ConfigEntry folderConfig, string type, IResourceFile[] files,
+        Func<MultipartFormDataContent, Task> upload)
+    {
+        var paths = files.Select(file => Path.Combine(folderConfig.Path, file.Path)).ToArray();
+
+        if (paths.All(_foundFilesCache.Contains) || paths.Any(_errorFilesCache.Contains))
+            return;
 
         foreach (var file in files)
         {
-            var pathRelative = Path.Combine(folderConfig.Path, file.Path);
-            var pathAbsolute = Path.GetFullPath(Path.Combine(_configOptions.DataPath, pathRelative));
-
-            if (_foundFilesCache.Contains(pathRelative) || _errorFilesCache.Contains(pathRelative))
-                continue;
-
             if (!ValidateFilePath(folderConfig.Path, file.Path))
             {
                 _logger.LogError("File path '{filePath}' goes beyond config path '{configPath}' for data type '{dataType}'.", file.Path, folderConfig.Path, type);
-                _errorFilesCache.Add(pathRelative);
-                continue;
-            }
 
-            var key = Guid.NewGuid().ToString();
+                foreach (var path in paths)
+                    _errorFilesCache.Add(path);
+
+                return;
+            }
+        }
+
+        var resources = files.Select((file, index) =>
+        {
+            var path = paths[index];
+            var key = _hostFilesCache.FindKey(path) ?? Guid.NewGuid().ToString();
             var url = $"{_workerOptions.Host}/api/file/{key}";
-            var resource = file.AsResource(type, url);
+            return new ResourceFile(key, path, file.AsResource(type, url));
+        }).ToArray();
 
-            try
+        try
+        {
+            var content = TsvWriter.Write(resources.Select(file => file.Resource));
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+            using var form = files[0].AsForm().AddField(SampleFile.ResourcesColumn, "resources.tsv", stream);
+
+            await upload(form);
+
+            foreach (var resource in resources)
             {
-                var content = TsvWriter.Write([resource]);
-                using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                var form = file.AsForm().AddField(SampleFile.ResourcesColumn, "resources.tsv", stream);
-
-                await UploadSample(type, form);
-
-                _hostFilesCache.Add(key, pathRelative);
-                _foundFilesCache.Add(pathRelative);
-                _logger.LogInformation("Uploaded and hosted file '{key}' '{path}'", key, pathRelative);
+                _hostFilesCache.Add(resource.Key, resource.Path);
+                _foundFilesCache.Add(resource.Path);
+                _logger.LogInformation("Uploaded and hosted file '{key}' '{path}'", resource.Key, resource.Path);
             }
-            catch (Exception ex)
-            {
-                _errorFilesCache.Add(pathRelative);
-                _logger.LogError("Failed to upload file '{path}'\n{message}", pathRelative, ex.Message);
-            }
+        }
+        catch (Exception ex)
+        {
+            foreach (var path in paths)
+                _errorFilesCache.Add(path);
+
+            _logger.LogError("Failed to upload resource group for data type '{dataType}'\n{message}", type, ex.Message);
         }
     }
 
